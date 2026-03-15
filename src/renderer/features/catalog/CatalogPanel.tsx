@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+п»їimport { useMemo } from "react";
 
 import type { CatalogSnapshot, LauncherApp } from "@shared/schemas/catalog";
 import { AppCard } from "@renderer/features/catalog/components/AppCard";
@@ -67,9 +67,9 @@ export const CatalogPanel = ({
     return (
       <section className="panel-card catalog-panel">
         <header className="panel-title-row">
-          <h2>Каталог приложений</h2>
+          <h2>Application Library</h2>
         </header>
-        <p className="muted">Загрузка каталога...</p>
+        <p className="muted">Loading catalog...</p>
       </section>
     );
   }
@@ -85,8 +85,8 @@ export const CatalogPanel = ({
     <section className="panel-card catalog-panel">
       <header className="catalog-panel__header">
         <div>
-          <h2>Игровая библиотека</h2>
-          <p>Выбери приложение, фильтруй по категориям и запускай без лишних шагов.</p>
+          <h2>Application Library</h2>
+          <p>Filter by category and launch apps quickly.</p>
         </div>
 
         <div className="catalog-panel__tools">
@@ -94,11 +94,11 @@ export const CatalogPanel = ({
             className="search-field"
             type="search"
             value={search}
-            placeholder="Поиск по названию и тегам"
+            placeholder="Search by name or tags"
             onChange={(event) => onSearchChange(event.target.value)}
           />
           <button type="button" className="ghost-button" onClick={onOpenPalette}>
-            Быстрая команда
+            Quick Command
           </button>
         </div>
       </header>
@@ -109,7 +109,7 @@ export const CatalogPanel = ({
           type="button"
           onClick={() => onCategoryChange("all")}
         >
-          Все ({catalog.apps.length})
+          All ({catalog.apps.length})
         </button>
 
         {catalog.categories.map((category) => (
@@ -126,11 +126,11 @@ export const CatalogPanel = ({
 
       <section className="recent-block">
         <div className="panel-title-row">
-          <h3>Последние запуски</h3>
+          <h3>Recent Launches</h3>
         </div>
 
         {recentApps.length === 0 ? (
-          <p className="muted">История запусков пока пустая.</p>
+          <p className="muted">No launch history yet.</p>
         ) : (
           <div className="recent-strip">
             {recentApps.map((app) => (
@@ -141,7 +141,7 @@ export const CatalogPanel = ({
                 onClick={() => onInspectApp(app.id)}
               >
                 <strong>{app.title}</strong>
-                <span>{recentMap.get(app.id) ? "Недавно активен" : "Без данных"}</span>
+                <span>{recentMap.get(app.id) ? "Recently active" : "No data"}</span>
               </button>
             ))}
           </div>
@@ -149,7 +149,7 @@ export const CatalogPanel = ({
       </section>
 
       <section className="catalog-grid-wrap">
-        {apps.length === 0 ? <p className="muted">Ничего не найдено по текущему фильтру.</p> : null}
+        {apps.length === 0 ? <p className="muted">No apps match current filters.</p> : null}
 
         <div className="app-grid">
           {apps.map((app) => (

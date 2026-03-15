@@ -1,4 +1,4 @@
-import type { CSSProperties } from "react";
+п»їimport type { CSSProperties } from "react";
 
 import type { LauncherApp } from "@shared/schemas/catalog";
 import { formatRelativeTime } from "@renderer/features/launcher/utils/time";
@@ -6,7 +6,7 @@ import { formatRelativeTime } from "@renderer/features/launcher/utils/time";
 interface AppCardProps {
   app: LauncherApp;
   launching: boolean;
-  lastLaunchedAt?: string;
+  lastLaunchedAt?: string | undefined;
   onLaunch(appId: string): void;
   onInspect(appId: string): void;
 }
@@ -37,11 +37,11 @@ export const AppCard = ({ app, launching, lastLaunchedAt, onLaunch, onInspect }:
 
         <div>
           <h4>{app.title}</h4>
-          <p>{app.description ?? "Описание отсутствует"}</p>
+          <p>{app.description ?? "No description"}</p>
         </div>
 
         <span className={`state-pill ${app.installed ? "state-pill--ok" : "state-pill--warn"}`}>
-          {app.installed ? "Готово" : "Missing"}
+          {app.installed ? "Ready" : "Missing"}
         </span>
       </div>
 
@@ -55,12 +55,12 @@ export const AppCard = ({ app, launching, lastLaunchedAt, onLaunch, onInspect }:
       </div>
 
       <div className="app-card__meta">
-        <small>{lastLaunchedAt ? `Последний запуск ${formatRelativeTime(lastLaunchedAt)}` : "Ещё не запускалось"}</small>
+        <small>{lastLaunchedAt ? `Last launch ${formatRelativeTime(lastLaunchedAt)}` : "Never launched"}</small>
       </div>
 
       <div className="app-card__actions">
         <button type="button" className="ghost-button" onClick={() => onInspect(app.id)}>
-          Детали
+          Details
         </button>
         <button
           type="button"
@@ -68,7 +68,7 @@ export const AppCard = ({ app, launching, lastLaunchedAt, onLaunch, onInspect }:
           onClick={() => onLaunch(app.id)}
           disabled={!app.installed || launching}
         >
-          {launching ? "Запуск..." : "Играть"}
+          {launching ? "Launching..." : "Launch"}
         </button>
       </div>
     </article>

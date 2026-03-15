@@ -1,4 +1,4 @@
-import type { SystemActionItem } from "@shared/schemas/actions";
+п»їimport type { SystemActionItem } from "@shared/schemas/actions";
 import { Modal } from "@renderer/features/launcher/components/Modal";
 
 interface ConfirmActionModalProps {
@@ -23,22 +23,22 @@ export const ConfirmActionModal = ({
   return (
     <Modal
       open={open}
-      title="Подтверждение системного действия"
+      title="Confirm System Action"
       onClose={running ? () => undefined : onCancel}
       footer={
         <div className="modal-actions">
           <button type="button" className="ghost-button" onClick={onCancel} disabled={running}>
-            Отмена
+            Cancel
           </button>
           <button type="button" className="danger-button" onClick={onConfirm} disabled={running}>
-            {running ? "Выполнение..." : "Подтвердить"}
+            {running ? "Running..." : "Confirm"}
           </button>
         </div>
       }
     >
       <p className="modal-emphasis">{action.title}</p>
       <p>{action.description}</p>
-      <p className="muted">Действие может повлиять на текущую игровую сессию и работу станции.</p>
+      <p className="muted">This action can affect the current session and workstation state.</p>
     </Modal>
   );
 };

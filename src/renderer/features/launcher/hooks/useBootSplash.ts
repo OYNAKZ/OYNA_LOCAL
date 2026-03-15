@@ -1,25 +1,25 @@
-import { useEffect, useMemo, useState } from "react";
+п»їimport { useEffect, useMemo, useState } from "react";
 
 const MIN_VISIBLE_DURATION_MS = 2_100;
 
 const getPhaseLabel = (progress: number, isReady: boolean): string => {
   if (progress < 22) {
-    return "Пробуждаем ядро";
+    return "Booting core";
   }
 
   if (progress < 48) {
-    return "Синхронизируем модули";
+    return "Syncing modules";
   }
 
   if (progress < 78) {
-    return "Подгружаем каталог станции";
+    return "Loading station catalog";
   }
 
   if (progress < 100) {
-    return isReady ? "Финальные проверки" : "Ожидание сервисов";
+    return isReady ? "Final checks" : "Waiting for services";
   }
 
-  return "Добро пожаловать в OYNA";
+  return "Welcome to OYNA";
 };
 
 export const useBootSplash = (isReady: boolean) => {

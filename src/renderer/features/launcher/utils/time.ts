@@ -1,21 +1,21 @@
-const relativeFormatter = new Intl.RelativeTimeFormat("ru-RU", {
+п»їconst relativeFormatter = new Intl.RelativeTimeFormat("en-US", {
   numeric: "auto"
 });
 
-const activityTimeFormatter = new Intl.DateTimeFormat("ru-RU", {
-  day: "2-digit",
+const activityTimeFormatter = new Intl.DateTimeFormat("en-US", {
   month: "short",
+  day: "2-digit",
   hour: "2-digit",
   minute: "2-digit"
 });
 
-const dashboardDateFormatter = new Intl.DateTimeFormat("ru-RU", {
+const dashboardDateFormatter = new Intl.DateTimeFormat("en-US", {
   weekday: "short",
-  day: "2-digit",
-  month: "long"
+  month: "short",
+  day: "2-digit"
 });
 
-const dashboardClockFormatter = new Intl.DateTimeFormat("ru-RU", {
+const dashboardClockFormatter = new Intl.DateTimeFormat("en-US", {
   hour: "2-digit",
   minute: "2-digit"
 });
@@ -24,14 +24,14 @@ export const formatRelativeTime = (iso: string): string => {
   const timestamp = Date.parse(iso);
 
   if (Number.isNaN(timestamp)) {
-    return "только что";
+    return "just now";
   }
 
   const diffSeconds = Math.round((timestamp - Date.now()) / 1000);
   const absSeconds = Math.abs(diffSeconds);
 
   if (absSeconds < 45) {
-    return "только что";
+    return "just now";
   }
 
   if (absSeconds < 3600) {

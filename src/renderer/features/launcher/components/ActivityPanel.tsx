@@ -1,4 +1,4 @@
-import { formatActivityTime } from "@renderer/features/launcher/utils/time";
+п»їimport { formatActivityTime } from "@renderer/features/launcher/utils/time";
 import type { ActivityEntry } from "@renderer/features/launcher/types";
 
 interface ActivityPanelProps {
@@ -8,12 +8,12 @@ interface ActivityPanelProps {
 export const ActivityPanel = ({ entries }: ActivityPanelProps) => (
   <section className="panel-card activity-panel">
     <div className="panel-title-row">
-      <h3>Лента активности</h3>
+      <h3>Activity Feed</h3>
       <span>{entries.length}</span>
     </div>
 
     {entries.length === 0 ? (
-      <p className="muted">Пока нет событий. Запусти приложение или системное действие.</p>
+      <p className="muted">No events yet. Launch an app or run a system action.</p>
     ) : (
       <ul className="activity-list">
         {entries.map((entry) => (

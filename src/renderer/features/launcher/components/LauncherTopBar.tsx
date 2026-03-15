@@ -1,4 +1,4 @@
-interface LauncherTopBarProps {
+п»їinterface LauncherTopBarProps {
   totalApps: number;
   installedApps: number;
   categoryCount: number;
@@ -26,8 +26,8 @@ export const LauncherTopBar = ({
   <header className="oyna-topbar panel-card">
     <div className="oyna-brand">
       <p className="oyna-brand__kicker">OYNA // LAUNCHER</p>
-      <h1>Игровая станция клуба</h1>
-      <p className="oyna-brand__subtitle">Локальная консоль запуска и управления рабочим местом</p>
+      <h1>Local Game Station Console</h1>
+      <p className="oyna-brand__subtitle">Fast local launcher and workstation control panel</p>
     </div>
 
     <div className="oyna-topbar__right">
@@ -41,7 +41,7 @@ export const LauncherTopBar = ({
           Apps {installedApps}/{totalApps}
         </span>
         <span className="stat-chip" role="listitem">
-          Категории {categoryCount}
+          Categories {categoryCount}
         </span>
         <span className={`stat-chip ${adminModeEnabled ? "stat-chip--active" : ""}`} role="listitem">
           Admin {adminModeEnabled ? "ON" : "OFF"}
@@ -53,7 +53,7 @@ export const LauncherTopBar = ({
 
       <div className="oyna-topbar__actions">
         <button type="button" className="ghost-button" onClick={onOpenPalette}>
-          Команды (Ctrl+K)
+          Commands (Ctrl+K)
         </button>
         <button
           type="button"
@@ -61,7 +61,7 @@ export const LauncherTopBar = ({
           onClick={onRefreshCatalog}
           disabled={refreshing}
         >
-          {refreshing ? "Обновление..." : "Обновить каталог"}
+          {refreshing ? "Refreshing..." : "Refresh Catalog"}
         </button>
       </div>
     </div>

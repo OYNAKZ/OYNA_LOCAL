@@ -1,0 +1,28 @@
+﻿:root {
+  --font-ui: "Segoe UI", Tahoma, Arial, sans-serif;
+  --font-display: "Segoe UI", Tahoma, Arial, sans-serif;
+
+  --bg-0: #090b0f;
+  --bg-1: #10141b;
+  --bg-2: #141a23;
+
+  --text-strong: #e6edf6;
+  --text-soft: #9aa8ba;
+
+  --panel: #141a23;
+  --panel-strong: #11161e;
+  --line: #2d3a4c;
+  --line-strong: #415674;
+
+  --accent-cyan: #4db3ff;
+  --accent-green: #6acb8b;
+  --accent-orange: #e2a14f;
+  --accent-red: #d16a78;
+
+  --shadow-panel: none;
+  --shadow-glow: none;
+
+  --radius-xl: 0;
+  --radius-lg: 0;
+  --radius-md: 0;
+}

@@ -1,4 +1,4 @@
-interface BootSplashProps {
+п»їinterface BootSplashProps {
   visible: boolean;
   progress: number;
   phase: string;
@@ -17,7 +17,7 @@ export const BootSplash = ({ visible, progress, phase }: BootSplashProps) => {
       <div className="boot-splash__content">
         <p className="boot-splash__kicker">GAME STATION</p>
         <h1>OYNA</h1>
-        <p className="boot-splash__subtitle">Запуск локального лаунчера</p>
+        <p className="boot-splash__subtitle">Starting local launcher</p>
 
         <div className="boot-progress">
           <span style={{ width: `${progress}%` }} />

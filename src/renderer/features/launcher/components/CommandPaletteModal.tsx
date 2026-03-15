@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from "react";
+п»їimport { useEffect, useMemo, useRef } from "react";
 
 import type { CatalogSnapshot } from "@shared/schemas/catalog";
 import { Modal } from "@renderer/features/launcher/components/Modal";
@@ -69,11 +69,11 @@ export const CommandPaletteModal = ({
   return (
     <Modal
       open={open}
-      title="Командная палитра"
+      title="Command Palette"
       onClose={onClose}
       footer={
         <div className="modal-footer-hint">
-          <span>Найди приложение и запусти его в один клик.</span>
+          <span>Find and launch applications instantly.</span>
           <kbd>Ctrl+K</kbd>
         </div>
       }
@@ -84,7 +84,7 @@ export const CommandPaletteModal = ({
           type="search"
           value={query}
           className="search-field"
-          placeholder="Поиск по названию или тегам"
+          placeholder="Search by app title or tag"
           onChange={(event) => onQueryChange(event.target.value)}
         />
       </div>
@@ -100,16 +100,14 @@ export const CommandPaletteModal = ({
             >
               <div>
                 <strong>{app.title}</strong>
-                <p>{app.description ?? "Без описания"}</p>
+                <p>{app.description ?? "No description"}</p>
               </div>
-              <span>
-                {launchingAppId === app.id ? "..." : app.installed ? "Запуск" : "Недоступно"}
-              </span>
+              <span>{launchingAppId === app.id ? "..." : app.installed ? "Launch" : "Unavailable"}</span>
             </button>
           </li>
         ))}
 
-        {matches.length === 0 ? <li className="muted">Совпадений не найдено.</li> : null}
+        {matches.length === 0 ? <li className="muted">No matches found.</li> : null}
       </ul>
     </Modal>
   );

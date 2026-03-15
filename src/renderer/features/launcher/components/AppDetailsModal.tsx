@@ -1,4 +1,4 @@
-import type { LauncherApp } from "@shared/schemas/catalog";
+п»їimport type { LauncherApp } from "@shared/schemas/catalog";
 import { Modal } from "@renderer/features/launcher/components/Modal";
 import { formatRelativeTime } from "@renderer/features/launcher/utils/time";
 
@@ -24,7 +24,7 @@ export const AppDetailsModal = ({
   }
 
   const launching = launchingAppId === app.id;
-  const launchLabel = lastLaunchedAt ? formatRelativeTime(lastLaunchedAt) : "ещё не запускалось";
+  const launchLabel = lastLaunchedAt ? formatRelativeTime(lastLaunchedAt) : "never launched";
 
   return (
     <Modal
@@ -34,7 +34,7 @@ export const AppDetailsModal = ({
       footer={
         <div className="modal-actions">
           <button type="button" className="ghost-button" onClick={onClose}>
-            Закрыть
+            Close
           </button>
           <button
             type="button"
@@ -42,21 +42,21 @@ export const AppDetailsModal = ({
             onClick={() => onLaunch(app.id)}
             disabled={!app.installed || launching}
           >
-            {launching ? "Запуск..." : "Запустить"}
+            {launching ? "Launching..." : "Launch"}
           </button>
         </div>
       }
     >
-      <p className="modal-emphasis">{app.installed ? "Приложение готово к запуску" : "Приложение не найдено"}</p>
-      <p>{app.description ?? "Описание отсутствует"}</p>
+      <p className="modal-emphasis">{app.installed ? "Application ready" : "Application not found"}</p>
+      <p>{app.description ?? "No description"}</p>
 
       <div className="details-grid">
         <div>
-          <small>Категория</small>
+          <small>Category</small>
           <strong>{app.categoryId}</strong>
         </div>
         <div>
-          <small>Последний запуск</small>
+          <small>Last launch</small>
           <strong>{launchLabel}</strong>
         </div>
       </div>
