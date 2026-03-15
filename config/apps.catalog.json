@@ -1,0 +1,130 @@
+{
+  "version": "1.0.0",
+  "categories": [
+    {
+      "id": "core",
+      "title": "Core",
+      "order": 0
+    },
+    {
+      "id": "productivity",
+      "title": "Productivity",
+      "order": 1
+    },
+    {
+      "id": "development",
+      "title": "Development",
+      "order": 2
+    }
+  ],
+  "apps": [
+    {
+      "id": "windows-explorer",
+      "title": "Explorer",
+      "description": "Open Windows file explorer",
+      "categoryId": "core",
+      "tags": ["files", "windows"],
+      "requiresAdmin": false,
+      "launch": {
+        "executable": "%WINDIR%\\explorer.exe",
+        "args": [],
+        "useShell": false
+      },
+      "installDetection": {
+        "type": "pathExists",
+        "paths": ["%WINDIR%\\explorer.exe"]
+      }
+    },
+    {
+      "id": "notepad",
+      "title": "Notepad",
+      "description": "Simple text editor",
+      "categoryId": "core",
+      "tags": ["text", "editor"],
+      "requiresAdmin": false,
+      "launch": {
+        "executable": "%WINDIR%\\System32\\notepad.exe",
+        "args": [],
+        "useShell": false
+      },
+      "installDetection": {
+        "type": "pathExists",
+        "paths": ["%WINDIR%\\System32\\notepad.exe"]
+      }
+    },
+    {
+      "id": "calculator",
+      "title": "Calculator",
+      "description": "Windows Calculator",
+      "categoryId": "productivity",
+      "tags": ["math", "utility"],
+      "requiresAdmin": false,
+      "launch": {
+        "executable": "%WINDIR%\\System32\\calc.exe",
+        "args": [],
+        "useShell": false
+      },
+      "installDetection": {
+        "type": "pathExists",
+        "paths": ["%WINDIR%\\System32\\calc.exe"]
+      }
+    },
+    {
+      "id": "powershell",
+      "title": "PowerShell",
+      "description": "Windows PowerShell console",
+      "categoryId": "development",
+      "tags": ["shell", "terminal"],
+      "requiresAdmin": false,
+      "launch": {
+        "executable": "%WINDIR%\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+        "args": [],
+        "useShell": false
+      },
+      "installDetection": {
+        "type": "pathExists",
+        "paths": ["%WINDIR%\\System32\\WindowsPowerShell\\v1.0\\powershell.exe"]
+      }
+    },
+    {
+      "id": "vscode",
+      "title": "Visual Studio Code",
+      "description": "Code editor",
+      "categoryId": "development",
+      "tags": ["code", "editor", "typescript"],
+      "requiresAdmin": false,
+      "launch": {
+        "executable": "%LOCALAPPDATA%\\Programs\\Microsoft VS Code\\Code.exe",
+        "args": [],
+        "useShell": false
+      },
+      "installDetection": {
+        "type": "pathExists",
+        "paths": [
+          "%LOCALAPPDATA%\\Programs\\Microsoft VS Code\\Code.exe",
+          "%ProgramFiles%\\Microsoft VS Code\\Code.exe"
+        ]
+      }
+    },
+    {
+      "id": "chrome",
+      "title": "Google Chrome",
+      "description": "Web browser",
+      "categoryId": "productivity",
+      "tags": ["browser", "web"],
+      "requiresAdmin": false,
+      "launch": {
+        "executable": "%ProgramFiles%\\Google\\Chrome\\Application\\chrome.exe",
+        "args": [],
+        "useShell": false
+      },
+      "installDetection": {
+        "type": "pathExists",
+        "paths": [
+          "%ProgramFiles%\\Google\\Chrome\\Application\\chrome.exe",
+          "%ProgramFiles(x86)%\\Google\\Chrome\\Application\\chrome.exe"
+        ]
+      }
+    }
+  ]
+}
