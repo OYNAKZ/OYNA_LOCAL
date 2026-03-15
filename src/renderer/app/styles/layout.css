@@ -16,9 +16,12 @@
 
 .oyna-backdrop {
   position: absolute;
-  inset: 14px;
-  border: 1px solid #1e2937;
-  background: rgba(6, 10, 15, 0.4);
+  inset: 12px;
+  border: 1px solid rgba(59, 72, 91, 0.72);
+  border-radius: calc(var(--radius-xl) + 2px);
+  background:
+    linear-gradient(180deg, rgba(12, 16, 23, 0.78), rgba(9, 13, 19, 0.78)),
+    radial-gradient(circle at 12% -8%, rgba(202, 73, 81, 0.08), transparent 46%);
   z-index: -1;
   pointer-events: none;
 }
@@ -26,40 +29,44 @@
 .panel-card {
   border-radius: var(--radius-xl);
   border: 1px solid var(--line);
-  background: var(--panel);
+  background:
+    linear-gradient(180deg, rgba(22, 29, 39, 0.94), rgba(17, 23, 32, 0.97)),
+    radial-gradient(circle at 0% 0%, rgba(87, 173, 201, 0.06), transparent 36%);
   box-shadow: var(--shadow-panel);
+  overflow: hidden;
 }
 
 .oyna-topbar {
   display: flex;
   justify-content: space-between;
   gap: 18px;
-  padding: 14px;
-  min-height: 120px;
+  padding: 16px;
+  min-height: 108px;
+  border-color: color-mix(in srgb, var(--line), #5c6f8f 35%);
+  background:
+    linear-gradient(180deg, rgba(26, 34, 46, 0.96), rgba(17, 24, 33, 0.98)),
+    radial-gradient(circle at 0% 0%, rgba(202, 73, 81, 0.1), transparent 52%);
 }
 
 .oyna-brand {
   display: flex;
   flex-direction: column;
+  justify-content: center;
   gap: 5px;
 }
 
 .oyna-brand h1 {
   font-family: var(--font-display);
-  font-size: clamp(22px, 2.2vw, 32px);
-  font-weight: 600;
-  letter-spacing: 0.02em;
+  font-size: clamp(24px, 2.2vw, 34px);
+  font-weight: 700;
+  letter-spacing: 0.03em;
 }
 
 .oyna-brand__kicker {
-  color: var(--text-soft);
-  letter-spacing: 0.1em;
+  color: color-mix(in srgb, var(--text-soft), #d6dee8 22%);
+  letter-spacing: 0.14em;
   font-size: 12px;
-}
-
-.oyna-brand__subtitle {
-  max-width: 620px;
-  color: var(--text-soft);
+  text-transform: uppercase;
 }
 
 .oyna-topbar__right {
@@ -86,35 +93,38 @@
 .oyna-meta-clock strong {
   font-family: var(--font-display);
   font-size: 28px;
-  font-weight: 600;
+  font-weight: 700;
+  letter-spacing: 0.02em;
 }
 
 .oyna-stats-row {
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-end;
-  gap: 6px;
+  gap: 7px;
 }
 
 .stat-chip {
-  border: 1px solid var(--line);
-  background: #101721;
-  padding: 6px 10px;
+  border: 1px solid color-mix(in srgb, var(--line), #526078 22%);
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(20, 27, 36, 0.88), rgba(17, 23, 31, 0.88));
+  padding: 5px 10px;
   font-size: 12px;
+  color: color-mix(in srgb, var(--text-strong), #c8d2e2 24%);
 }
 
 .stat-chip--active {
-  border-color: #3d7450;
-  color: var(--accent-green);
+  border-color: color-mix(in srgb, var(--accent-red), #f2969d 28%);
+  color: color-mix(in srgb, var(--accent-red), #ffe9ea 30%);
 }
 
 .stat-chip--ok {
-  border-color: #3d7450;
+  border-color: color-mix(in srgb, var(--accent-green), #94e2b0 28%);
 }
 
 .stat-chip--warn {
-  border-color: #7d6236;
-  color: var(--accent-orange);
+  border-color: color-mix(in srgb, var(--accent-orange), #f1bc81 26%);
+  color: color-mix(in srgb, var(--accent-orange), #fff0dc 20%);
 }
 
 .oyna-topbar__actions {
@@ -128,30 +138,31 @@
   border-radius: var(--radius-md);
   border: 1px solid var(--line);
   color: var(--text-strong);
-  padding: 8px 12px;
+  padding: 8px 13px;
   cursor: pointer;
-  transition: border-color 120ms ease, background-color 120ms ease;
+  transition: transform 120ms ease, border-color 120ms ease, background-color 120ms ease;
 }
 
 .ghost-button {
-  background: #111823;
+  background: linear-gradient(180deg, rgba(21, 29, 40, 0.96), rgba(16, 22, 30, 0.96));
 }
 
 .primary-button {
-  border-color: #2d547a;
-  background: #163250;
-  color: #d9ebff;
-  font-weight: 600;
+  border-color: color-mix(in srgb, var(--accent-red), #f1999e 24%);
+  background: linear-gradient(150deg, #a12a31, #ca4951);
+  color: #fff7f8;
+  font-weight: 700;
 }
 
 .danger-button {
-  border-color: #7b3d47;
-  background: #3b2026;
+  border-color: color-mix(in srgb, var(--accent-red), #f2969d 25%);
+  background: linear-gradient(150deg, #68232a, #7c2d35);
 }
 
 .ghost-button:hover,
 .primary-button:hover,
 .danger-button:hover {
+  transform: translateY(-1px);
   border-color: var(--line-strong);
 }
 
@@ -160,6 +171,7 @@
 .danger-button:disabled {
   opacity: 0.58;
   cursor: not-allowed;
+  transform: none;
 }
 
 .oyna-grid {
@@ -187,8 +199,8 @@
 .panel-title-row h2,
 .panel-title-row h3 {
   font-family: var(--font-display);
-  font-weight: 600;
-  letter-spacing: 0.01em;
+  font-weight: 700;
+  letter-spacing: 0.02em;
 }
 
 @media (max-width: 1280px) {

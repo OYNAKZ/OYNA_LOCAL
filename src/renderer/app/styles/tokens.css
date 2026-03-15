@@ -1,28 +1,28 @@
 ﻿:root {
-  --font-ui: "Segoe UI", Tahoma, Arial, sans-serif;
-  --font-display: "Segoe UI", Tahoma, Arial, sans-serif;
+  --font-ui: "Bahnschrift", "Trebuchet MS", "Segoe UI", sans-serif;
+  --font-display: "Bahnschrift", "Agency FB", "Trebuchet MS", sans-serif;
 
-  --bg-0: #090b0f;
-  --bg-1: #10141b;
-  --bg-2: #141a23;
+  --bg-0: #090c11;
+  --bg-1: #0f141b;
+  --bg-2: #151c25;
 
-  --text-strong: #e6edf6;
-  --text-soft: #9aa8ba;
+  --text-strong: #f1f4fb;
+  --text-soft: #a0adbf;
 
-  --panel: #141a23;
-  --panel-strong: #11161e;
-  --line: #2d3a4c;
-  --line-strong: #415674;
+  --panel: #131a24;
+  --panel-strong: #101721;
+  --line: #2d3646;
+  --line-strong: #485a76;
 
-  --accent-cyan: #4db3ff;
-  --accent-green: #6acb8b;
-  --accent-orange: #e2a14f;
-  --accent-red: #d16a78;
+  --accent-cyan: #57adc9;
+  --accent-green: #6bc98f;
+  --accent-orange: #e2a15a;
+  --accent-red: #ca4951;
 
-  --shadow-panel: none;
-  --shadow-glow: none;
+  --shadow-panel: 0 14px 28px rgba(2, 5, 9, 0.42);
+  --shadow-glow: 0 0 0 rgba(0, 0, 0, 0);
 
-  --radius-xl: 0;
-  --radius-lg: 0;
-  --radius-md: 0;
+  --radius-xl: 14px;
+  --radius-lg: 11px;
+  --radius-md: 8px;
 }

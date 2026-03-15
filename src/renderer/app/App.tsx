@@ -1,16 +1,18 @@
 ﻿import { useCallback, useEffect, useMemo, useState } from "react";
 
+import type { LauncherApi } from "@shared/ipc/api";
 import type { AdminActionItem, AdminState, SystemActionItem } from "@shared/schemas/actions";
 import type { CatalogSnapshot } from "@shared/schemas/catalog";
 import type { Result } from "@shared/schemas/common";
 import { AdminPanel } from "@renderer/features/admin/AdminPanel";
+import { BillingFeature, formatMinutesAsLabel } from "@renderer/features/billing/BillingFeature";
 import { CatalogPanel } from "@renderer/features/catalog/CatalogPanel";
-import { ActivityPanel } from "@renderer/features/launcher/components/ActivityPanel";
 import { AppDetailsModal } from "@renderer/features/launcher/components/AppDetailsModal";
 import { BootSplash } from "@renderer/features/launcher/components/BootSplash";
 import { CommandPaletteModal } from "@renderer/features/launcher/components/CommandPaletteModal";
 import { ConfirmActionModal } from "@renderer/features/launcher/components/ConfirmActionModal";
 import { LauncherTopBar } from "@renderer/features/launcher/components/LauncherTopBar";
+import { SessionSnapshotPanel } from "@renderer/features/launcher/components/SessionSnapshotPanel";
 import { ToastStack } from "@renderer/features/launcher/components/ToastStack";
 import { useBootSplash } from "@renderer/features/launcher/hooks/useBootSplash";
 import { useClock } from "@renderer/features/launcher/hooks/useClock";
@@ -28,6 +30,16 @@ const unwrap = <T,>(result: Result<T>): T => {
 const createId = (): string => `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
 
 type ToastInput = Omit<ToastMessage, "id" | "createdAt">;
+
+const resolveLauncherApi = (): LauncherApi => {
+  const api = (window as Window & { launcherApi?: LauncherApi }).launcherApi;
+
+  if (!api) {
+    throw new Error("Launcher bridge is unavailable. Start the app in Electron mode.");
+  }
+
+  return api;
+};
 
 export const App = () => {
   const [catalog, setCatalog] = useState<CatalogSnapshot | null>(null);
@@ -48,7 +60,10 @@ export const App = () => {
   const [confirmAction, setConfirmAction] = useState<SystemActionItem | null>(null);
   const [inspectAppId, setInspectAppId] = useState<string | null>(null);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
+  const [isBillingOpen, setIsBillingOpen] = useState(false);
   const [commandQuery, setCommandQuery] = useState("");
+
+  const [walletMinutes, setWalletMinutes] = useState(0);
 
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
   const [activity, setActivity] = useState<ActivityEntry[]>([]);
@@ -101,7 +116,8 @@ export const App = () => {
     async (options?: { silent?: boolean }) => {
       try {
         setRefreshingCatalog(true);
-        const refreshed = await window.launcherApi.refreshCatalog();
+        const api = resolveLauncherApi();
+        const refreshed = await api.refreshCatalog();
         setCatalog(unwrap(refreshed));
 
         if (!options?.silent) {
@@ -129,11 +145,12 @@ export const App = () => {
 
   const loadInitialData = useCallback(async () => {
     try {
+      const api = resolveLauncherApi();
       const [catalogResult, systemResult, adminActionsResult, adminStateResult] = await Promise.all([
-        window.launcherApi.getCatalog(),
-        window.launcherApi.getSystemActions(),
-        window.launcherApi.getAdminActions(),
-        window.launcherApi.getAdminState()
+        api.getCatalog(),
+        api.getSystemActions(),
+        api.getAdminActions(),
+        api.getAdminState()
       ]);
 
       setCatalog(unwrap(catalogResult));
@@ -144,7 +161,7 @@ export const App = () => {
       pushToast({
         tone: "success",
         title: "OYNA Ready",
-        message: "Launcher is loaded and waiting for commands."
+        message: "Launcher is loaded."
       });
       pushActivity("success", "Initialization Complete", "All panels are ready.");
     } catch (error) {
@@ -202,10 +219,11 @@ export const App = () => {
         setLaunchingAppId(appId);
         pushActivity("info", "Launch Requested", appTitle);
 
-        const launchResult = await window.launcherApi.launchApp(appId);
+        const api = resolveLauncherApi();
+        const launchResult = await api.launchApp(appId);
         unwrap(launchResult);
 
-        const updatedCatalog = await window.launcherApi.getCatalog();
+        const updatedCatalog = await api.getCatalog();
         setCatalog(unwrap(updatedCatalog));
 
         pushToast({
@@ -235,7 +253,8 @@ export const App = () => {
         setRunningSystemActionId(action.id);
         pushActivity("info", "System Action", action.title);
 
-        const result = await window.launcherApi.runSystemAction(action.id);
+        const api = resolveLauncherApi();
+        const result = await api.runSystemAction(action.id);
         unwrap(result);
 
         pushToast({
@@ -284,7 +303,8 @@ export const App = () => {
   const handleToggleAdminMode = useCallback(
     async (enabled: boolean) => {
       try {
-        const result = await window.launcherApi.setAdminState(enabled);
+        const api = resolveLauncherApi();
+        const result = await api.setAdminState(enabled);
         setAdminState(unwrap(result));
 
         pushToast({
@@ -313,7 +333,8 @@ export const App = () => {
       try {
         setRunningAdminActionId(actionId);
 
-        const result = await window.launcherApi.runAdminAction(actionId);
+        const api = resolveLauncherApi();
+        const result = await api.runAdminAction(actionId);
         unwrap(result);
 
         if (actionId === "reloadCatalog") {
@@ -373,15 +394,13 @@ export const App = () => {
           totalApps={totalAppsCount}
           installedApps={installedAppsCount}
           categoryCount={categoriesCount}
+          walletLabel={formatMinutesAsLabel(walletMinutes)}
           adminModeEnabled={adminState?.adminModeEnabled ?? false}
           processElevated={adminState?.processElevated ?? false}
           dateLabel={dateLabel}
           timeLabel={timeLabel}
           refreshing={refreshingCatalog}
-          onOpenPalette={() => {
-            setCommandQuery("");
-            setIsCommandPaletteOpen(true);
-          }}
+          onOpenBilling={() => setIsBillingOpen(true)}
           onRefreshCatalog={() => {
             void refreshCatalog();
           }}
@@ -400,10 +419,6 @@ export const App = () => {
               void handleLaunch(appId);
             }}
             onInspectApp={setInspectAppId}
-            onOpenPalette={() => {
-              setCommandQuery("");
-              setIsCommandPaletteOpen(true);
-            }}
           />
 
           <aside className="oyna-side-column">
@@ -423,7 +438,13 @@ export const App = () => {
               }}
             />
 
-            <ActivityPanel entries={activity} />
+            <SessionSnapshotPanel
+              entries={activity}
+              walletLabel={formatMinutesAsLabel(walletMinutes)}
+              installedApps={installedAppsCount}
+              totalApps={totalAppsCount}
+              adminModeEnabled={adminState?.adminModeEnabled ?? false}
+            />
           </aside>
         </section>
 
@@ -458,7 +479,18 @@ export const App = () => {
           onQueryChange={setCommandQuery}
           onLaunch={handleLaunchFromPalette}
         />
+
+        <BillingFeature
+          open={isBillingOpen}
+          walletMinutes={walletMinutes}
+          onClose={() => setIsBillingOpen(false)}
+          onWalletChange={setWalletMinutes}
+          onToast={pushToast}
+          onActivity={pushActivity}
+        />
       </main>
     </>
   );
 };
+
+

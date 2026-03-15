@@ -1,5 +1,5 @@
-{
-  "version": "1.0.0",
+﻿{
+  "version": "1.1.0",
   "categories": [
     {
       "id": "core",
@@ -7,14 +7,29 @@
       "order": 0
     },
     {
-      "id": "productivity",
-      "title": "Productivity",
+      "id": "gaming",
+      "title": "Gaming",
       "order": 1
+    },
+    {
+      "id": "communication",
+      "title": "Communication",
+      "order": 2
+    },
+    {
+      "id": "media",
+      "title": "Media",
+      "order": 3
+    },
+    {
+      "id": "tools",
+      "title": "Tools",
+      "order": 4
     },
     {
       "id": "development",
       "title": "Development",
-      "order": 2
+      "order": 5
     }
   ],
   "apps": [
@@ -23,6 +38,7 @@
       "title": "Explorer",
       "description": "Open Windows file explorer",
       "categoryId": "core",
+      "icon": "explorer",
       "tags": ["files", "windows"],
       "requiresAdmin": false,
       "launch": {
@@ -40,6 +56,7 @@
       "title": "Notepad",
       "description": "Simple text editor",
       "categoryId": "core",
+      "icon": "notepad",
       "tags": ["text", "editor"],
       "requiresAdmin": false,
       "launch": {
@@ -56,7 +73,8 @@
       "id": "calculator",
       "title": "Calculator",
       "description": "Windows Calculator",
-      "categoryId": "productivity",
+      "categoryId": "core",
+      "icon": "calculator",
       "tags": ["math", "utility"],
       "requiresAdmin": false,
       "launch": {
@@ -70,10 +88,32 @@
       }
     },
     {
+      "id": "chrome",
+      "title": "Google Chrome",
+      "description": "Web browser",
+      "categoryId": "core",
+      "icon": "chrome",
+      "tags": ["browser", "web"],
+      "requiresAdmin": false,
+      "launch": {
+        "executable": "%ProgramFiles%\\Google\\Chrome\\Application\\chrome.exe",
+        "args": [],
+        "useShell": false
+      },
+      "installDetection": {
+        "type": "pathExists",
+        "paths": [
+          "%ProgramFiles%\\Google\\Chrome\\Application\\chrome.exe",
+          "%ProgramFiles(x86)%\\Google\\Chrome\\Application\\chrome.exe"
+        ]
+      }
+    },
+    {
       "id": "powershell",
       "title": "PowerShell",
       "description": "Windows PowerShell console",
-      "categoryId": "development",
+      "categoryId": "core",
+      "icon": "powershell",
       "tags": ["shell", "terminal"],
       "requiresAdmin": false,
       "launch": {
@@ -91,6 +131,7 @@
       "title": "Visual Studio Code",
       "description": "Code editor",
       "categoryId": "development",
+      "icon": "vscode",
       "tags": ["code", "editor", "typescript"],
       "requiresAdmin": false,
       "launch": {
@@ -107,24 +148,293 @@
       }
     },
     {
-      "id": "chrome",
-      "title": "Google Chrome",
-      "description": "Web browser",
-      "categoryId": "productivity",
-      "tags": ["browser", "web"],
+      "id": "discord",
+      "title": "Discord",
+      "description": "Voice and text communication",
+      "categoryId": "communication",
+      "icon": "discord",
+      "tags": ["voice", "chat", "community"],
       "requiresAdmin": false,
       "launch": {
-        "executable": "%ProgramFiles%\\Google\\Chrome\\Application\\chrome.exe",
+        "executable": "%LOCALAPPDATA%\\Discord\\Update.exe",
+        "args": ["--processStart", "Discord.exe"],
+        "useShell": false
+      },
+      "installDetection": {
+        "type": "pathExists",
+        "paths": [
+          "%LOCALAPPDATA%\\Discord\\Update.exe",
+          "%LOCALAPPDATA%\\Discord\\app-1.0.9009\\Discord.exe"
+        ]
+      }
+    },
+    {
+      "id": "steam",
+      "title": "Steam",
+      "description": "PC game launcher and library",
+      "categoryId": "gaming",
+      "icon": "steam",
+      "tags": ["games", "launcher", "store"],
+      "requiresAdmin": false,
+      "launch": {
+        "executable": "%ProgramFiles(x86)%\\Steam\\Steam.exe",
         "args": [],
         "useShell": false
       },
       "installDetection": {
         "type": "pathExists",
         "paths": [
-          "%ProgramFiles%\\Google\\Chrome\\Application\\chrome.exe",
-          "%ProgramFiles(x86)%\\Google\\Chrome\\Application\\chrome.exe"
+          "%ProgramFiles(x86)%\\Steam\\Steam.exe",
+          "%ProgramFiles%\\Steam\\Steam.exe"
+        ]
+      }
+    },
+    {
+      "id": "epic-games",
+      "title": "Epic Games Launcher",
+      "description": "Epic game launcher and store",
+      "categoryId": "gaming",
+      "icon": "epic",
+      "tags": ["games", "launcher", "epic"],
+      "requiresAdmin": false,
+      "launch": {
+        "executable": "%ProgramFiles(x86)%\\Epic Games\\Launcher\\Portal\\Binaries\\Win64\\EpicGamesLauncher.exe",
+        "args": [],
+        "useShell": false
+      },
+      "installDetection": {
+        "type": "pathExists",
+        "paths": [
+          "%ProgramFiles(x86)%\\Epic Games\\Launcher\\Portal\\Binaries\\Win64\\EpicGamesLauncher.exe",
+          "%ProgramFiles%\\Epic Games\\Launcher\\Portal\\Binaries\\Win64\\EpicGamesLauncher.exe"
+        ]
+      }
+    },
+    {
+      "id": "riot-client",
+      "title": "Riot Client",
+      "description": "Riot Games launcher",
+      "categoryId": "gaming",
+      "icon": "riot",
+      "tags": ["games", "valorant", "league"],
+      "requiresAdmin": false,
+      "launch": {
+        "executable": "%LOCALAPPDATA%\\Riot Games\\Riot Client\\RiotClientServices.exe",
+        "args": [],
+        "useShell": false
+      },
+      "installDetection": {
+        "type": "pathExists",
+        "paths": [
+          "%LOCALAPPDATA%\\Riot Games\\Riot Client\\RiotClientServices.exe",
+          "%ProgramFiles%\\Riot Games\\Riot Client\\RiotClientServices.exe"
+        ]
+      }
+    },
+    {
+      "id": "battlenet",
+      "title": "Battle.net",
+      "description": "Blizzard game launcher",
+      "categoryId": "gaming",
+      "icon": "battlenet",
+      "tags": ["games", "blizzard"],
+      "requiresAdmin": false,
+      "launch": {
+        "executable": "%ProgramFiles(x86)%\\Battle.net\\Battle.net Launcher.exe",
+        "args": [],
+        "useShell": false
+      },
+      "installDetection": {
+        "type": "pathExists",
+        "paths": [
+          "%ProgramFiles(x86)%\\Battle.net\\Battle.net Launcher.exe",
+          "%ProgramFiles%\\Battle.net\\Battle.net Launcher.exe"
+        ]
+      }
+    },
+    {
+      "id": "ubisoft-connect",
+      "title": "Ubisoft Connect",
+      "description": "Ubisoft games launcher",
+      "categoryId": "gaming",
+      "icon": "ubisoft",
+      "tags": ["games", "ubisoft"],
+      "requiresAdmin": false,
+      "launch": {
+        "executable": "%ProgramFiles(x86)%\\Ubisoft\\Ubisoft Game Launcher\\UbisoftConnect.exe",
+        "args": [],
+        "useShell": false
+      },
+      "installDetection": {
+        "type": "pathExists",
+        "paths": [
+          "%ProgramFiles(x86)%\\Ubisoft\\Ubisoft Game Launcher\\UbisoftConnect.exe",
+          "%ProgramFiles%\\Ubisoft\\Ubisoft Game Launcher\\UbisoftConnect.exe"
+        ]
+      }
+    },
+    {
+      "id": "ea-app",
+      "title": "EA App",
+      "description": "Electronic Arts launcher",
+      "categoryId": "gaming",
+      "icon": "ea",
+      "tags": ["games", "ea"],
+      "requiresAdmin": false,
+      "launch": {
+        "executable": "%ProgramFiles%\\Electronic Arts\\EA Desktop\\EA Desktop\\EADesktop.exe",
+        "args": [],
+        "useShell": false
+      },
+      "installDetection": {
+        "type": "pathExists",
+        "paths": [
+          "%ProgramFiles%\\Electronic Arts\\EA Desktop\\EA Desktop\\EADesktop.exe",
+          "%ProgramFiles(x86)%\\Electronic Arts\\EA Desktop\\EA Desktop\\EADesktop.exe"
+        ]
+      }
+    },
+    {
+      "id": "telegram",
+      "title": "Telegram",
+      "description": "Messenger",
+      "categoryId": "communication",
+      "icon": "telegram",
+      "tags": ["chat", "messenger"],
+      "requiresAdmin": false,
+      "launch": {
+        "executable": "%APPDATA%\\Telegram Desktop\\Telegram.exe",
+        "args": [],
+        "useShell": false
+      },
+      "installDetection": {
+        "type": "pathExists",
+        "paths": [
+          "%APPDATA%\\Telegram Desktop\\Telegram.exe",
+          "%LOCALAPPDATA%\\Telegram Desktop\\Telegram.exe"
+        ]
+      }
+    },
+    {
+      "id": "teamspeak",
+      "title": "TeamSpeak",
+      "description": "Voice communication client",
+      "categoryId": "communication",
+      "icon": "teamspeak",
+      "tags": ["voice", "chat"],
+      "requiresAdmin": false,
+      "launch": {
+        "executable": "%ProgramFiles%\\TeamSpeak\\ts3client_win64.exe",
+        "args": [],
+        "useShell": false
+      },
+      "installDetection": {
+        "type": "pathExists",
+        "paths": [
+          "%ProgramFiles%\\TeamSpeak\\ts3client_win64.exe",
+          "%ProgramFiles(x86)%\\TeamSpeak\\ts3client_win64.exe"
+        ]
+      }
+    },
+    {
+      "id": "spotify",
+      "title": "Spotify",
+      "description": "Music streaming",
+      "categoryId": "media",
+      "icon": "spotify",
+      "tags": ["music", "audio"],
+      "requiresAdmin": false,
+      "launch": {
+        "executable": "%APPDATA%\\Spotify\\Spotify.exe",
+        "args": [],
+        "useShell": false
+      },
+      "installDetection": {
+        "type": "pathExists",
+        "paths": ["%APPDATA%\\Spotify\\Spotify.exe"]
+      }
+    },
+    {
+      "id": "obs-studio",
+      "title": "OBS Studio",
+      "description": "Streaming and recording",
+      "categoryId": "media",
+      "icon": "obs",
+      "tags": ["stream", "recording", "video"],
+      "requiresAdmin": false,
+      "launch": {
+        "executable": "%ProgramFiles%\\obs-studio\\bin\\64bit\\obs64.exe",
+        "args": [],
+        "useShell": false
+      },
+      "installDetection": {
+        "type": "pathExists",
+        "paths": [
+          "%ProgramFiles%\\obs-studio\\bin\\64bit\\obs64.exe",
+          "%ProgramFiles(x86)%\\obs-studio\\bin\\64bit\\obs64.exe"
+        ]
+      }
+    },
+    {
+      "id": "vlc",
+      "title": "VLC Media Player",
+      "description": "Video and media player",
+      "categoryId": "media",
+      "icon": "vlc",
+      "tags": ["video", "media", "player"],
+      "requiresAdmin": false,
+      "launch": {
+        "executable": "%ProgramFiles%\\VideoLAN\\VLC\\vlc.exe",
+        "args": [],
+        "useShell": false
+      },
+      "installDetection": {
+        "type": "pathExists",
+        "paths": [
+          "%ProgramFiles%\\VideoLAN\\VLC\\vlc.exe",
+          "%ProgramFiles(x86)%\\VideoLAN\\VLC\\vlc.exe"
+        ]
+      }
+    },
+    {
+      "id": "opera-gx",
+      "title": "Opera GX",
+      "description": "Gaming browser",
+      "categoryId": "tools",
+      "icon": "opera",
+      "tags": ["browser", "gaming"],
+      "requiresAdmin": false,
+      "launch": {
+        "executable": "%LOCALAPPDATA%\\Programs\\Opera GX\\launcher.exe",
+        "args": [],
+        "useShell": false
+      },
+      "installDetection": {
+        "type": "pathExists",
+        "paths": ["%LOCALAPPDATA%\\Programs\\Opera GX\\launcher.exe"]
+      }
+    },
+    {
+      "id": "firefox",
+      "title": "Mozilla Firefox",
+      "description": "Alternative web browser",
+      "categoryId": "tools",
+      "icon": "firefox",
+      "tags": ["browser", "web"],
+      "requiresAdmin": false,
+      "launch": {
+        "executable": "%ProgramFiles%\\Mozilla Firefox\\firefox.exe",
+        "args": [],
+        "useShell": false
+      },
+      "installDetection": {
+        "type": "pathExists",
+        "paths": [
+          "%ProgramFiles%\\Mozilla Firefox\\firefox.exe",
+          "%ProgramFiles(x86)%\\Mozilla Firefox\\firefox.exe"
         ]
       }
     }
   ]
 }
+

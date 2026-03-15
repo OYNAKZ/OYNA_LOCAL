@@ -13,19 +13,34 @@ body {
   margin: 0;
   color: var(--text-strong);
   font-family: var(--font-ui);
-  background: linear-gradient(180deg, var(--bg-0), var(--bg-1) 40%, var(--bg-2));
+  background:
+    radial-gradient(64% 58% at 8% 0%, rgba(202, 73, 81, 0.2), transparent 62%),
+    radial-gradient(52% 48% at 96% 100%, rgba(80, 116, 160, 0.22), transparent 68%),
+    linear-gradient(180deg, var(--bg-0), var(--bg-1) 42%, var(--bg-2));
   overflow: hidden;
 }
 
-body::before {
+body::before,
+body::after {
   content: "";
   position: fixed;
   inset: 0;
   pointer-events: none;
+}
+
+body::before {
   background-image:
-    linear-gradient(rgba(90, 108, 133, 0.07) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(90, 108, 133, 0.07) 1px, transparent 1px);
+    linear-gradient(rgba(111, 127, 150, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(111, 127, 150, 0.08) 1px, transparent 1px);
   background-size: 28px 28px;
+  mask-image: radial-gradient(circle at 50% 45%, rgba(0, 0, 0, 0.85), transparent 80%);
+}
+
+body::after {
+  background:
+    radial-gradient(circle at 22% 28%, rgba(202, 73, 81, 0.17), transparent 38%),
+    radial-gradient(circle at 76% 22%, rgba(87, 173, 201, 0.16), transparent 36%);
+  filter: blur(42px);
 }
 
 button,

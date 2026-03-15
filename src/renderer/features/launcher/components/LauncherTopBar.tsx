@@ -4,10 +4,11 @@
   categoryCount: number;
   adminModeEnabled: boolean;
   processElevated: boolean;
+  walletLabel: string;
   dateLabel: string;
   timeLabel: string;
   refreshing: boolean;
-  onOpenPalette(): void;
+  onOpenBilling(): void;
   onRefreshCatalog(): void;
 }
 
@@ -17,17 +18,17 @@ export const LauncherTopBar = ({
   categoryCount,
   adminModeEnabled,
   processElevated,
+  walletLabel,
   dateLabel,
   timeLabel,
   refreshing,
-  onOpenPalette,
+  onOpenBilling,
   onRefreshCatalog
 }: LauncherTopBarProps) => (
   <header className="oyna-topbar panel-card">
     <div className="oyna-brand">
-      <p className="oyna-brand__kicker">OYNA // LAUNCHER</p>
-      <h1>Local Game Station Console</h1>
-      <p className="oyna-brand__subtitle">Fast local launcher and workstation control panel</p>
+      <p className="oyna-brand__kicker">OYNA</p>
+      <h1>Control Panel</h1>
     </div>
 
     <div className="oyna-topbar__right">
@@ -41,7 +42,10 @@ export const LauncherTopBar = ({
           Apps {installedApps}/{totalApps}
         </span>
         <span className="stat-chip" role="listitem">
-          Categories {categoryCount}
+          Groups {categoryCount}
+        </span>
+        <span className="stat-chip" role="listitem">
+          Wallet {walletLabel}
         </span>
         <span className={`stat-chip ${adminModeEnabled ? "stat-chip--active" : ""}`} role="listitem">
           Admin {adminModeEnabled ? "ON" : "OFF"}
@@ -52,8 +56,8 @@ export const LauncherTopBar = ({
       </div>
 
       <div className="oyna-topbar__actions">
-        <button type="button" className="ghost-button" onClick={onOpenPalette}>
-          Commands (Ctrl+K)
+        <button type="button" className="ghost-button" onClick={onOpenBilling}>
+          Tariffs
         </button>
         <button
           type="button"
@@ -61,7 +65,7 @@ export const LauncherTopBar = ({
           onClick={onRefreshCatalog}
           disabled={refreshing}
         >
-          {refreshing ? "Refreshing..." : "Refresh Catalog"}
+          {refreshing ? "Refreshing..." : "Refresh"}
         </button>
       </div>
     </div>
