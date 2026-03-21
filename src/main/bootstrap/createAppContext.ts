@@ -1,9 +1,10 @@
-import { join } from "node:path";
+﻿import { join } from "node:path";
 
 import { app } from "electron";
 
 import { CatalogConfigService } from "@main/services/config/catalogConfigService";
 import { CatalogQueryService } from "@main/services/config/catalogQueryService";
+import { HubAgentService } from "@main/services/hub/hubAgentService";
 import { createLoggerService } from "@main/services/logging/logger";
 import { InstalledStateService } from "@main/services/launcher/installedStateService";
 import { LaunchApplicationService } from "@main/services/launcher/launchApplicationService";
@@ -23,6 +24,7 @@ export interface AppContext {
     systemActionsService: SystemActionsService;
     adminActionsService: AdminActionsService;
     adminModeService: AdminModeService;
+    hubAgentService: HubAgentService;
   };
 }
 
@@ -53,6 +55,14 @@ export const createAppContext = (): AppContext => {
     logsDirectory,
     logger
   );
+  const hubAgentService = new HubAgentService({
+    logger,
+    catalogQueryService,
+    launchApplicationService,
+    systemActionsService,
+    adminActionsService,
+    adminModeService
+  });
 
   return {
     preloadPath: join(__dirname, "../preload/index.mjs"),
@@ -62,10 +72,10 @@ export const createAppContext = (): AppContext => {
       launchApplicationService,
       systemActionsService,
       adminActionsService,
-      adminModeService
+      adminModeService,
+      hubAgentService
     }
   };
 };
 
 export const isDevelopment = !app.isPackaged;
-

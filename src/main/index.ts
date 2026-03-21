@@ -1,4 +1,4 @@
-import { app } from "electron";
+﻿import { app } from "electron";
 
 import { createAppContext } from "@main/bootstrap/createAppContext";
 import { createMainWindow } from "@main/bootstrap/createMainWindow";
@@ -20,6 +20,17 @@ const bootstrap = async (): Promise<void> => {
 
   const context = createAppContext();
   registerIpcHandlers(context);
+
+  const { hubAgentService } = context.services;
+  void hubAgentService.start().catch((error: unknown) => {
+    context.logger.warn("Hub agent startup failed", {
+      error: error instanceof Error ? error.message : String(error)
+    });
+  });
+
+  app.on("before-quit", () => {
+    hubAgentService.stop();
+  });
 
   const mainWindow = createMainWindow({
     preloadPath: context.preloadPath,
