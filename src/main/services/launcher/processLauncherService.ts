@@ -11,6 +11,14 @@ export class ProcessLauncherService {
   public constructor(private readonly logger: Logger) {}
 
   public async launch(appConfig: CatalogAppConfig): Promise<void> {
+    if (appConfig.launch.executable.startsWith("oyna://mock/")) {
+      this.logger.info("Mock launch completed", {
+        appId: appConfig.id,
+        target: appConfig.launch.executable
+      });
+      return;
+    }
+
     const executablePath = toAbsolutePath(appConfig.launch.executable);
     const args = appConfig.launch.args;
     const cwd = resolveWorkingDirectory(executablePath, appConfig.launch.workingDirectory);

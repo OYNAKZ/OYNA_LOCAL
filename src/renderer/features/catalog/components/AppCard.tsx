@@ -2,12 +2,10 @@
 
 import type { LauncherApp } from "@shared/schemas/catalog";
 import { AppIcon } from "@renderer/features/catalog/components/AppIcon";
-import { formatRelativeTime } from "@renderer/features/launcher/utils/time";
 
 interface AppCardProps {
   app: LauncherApp;
   launching: boolean;
-  lastLaunchedAt?: string | undefined;
   onLaunch(appId: string): void;
   onInspect(appId: string): void;
 }
@@ -29,7 +27,7 @@ const THEME_BY_CATEGORY: Record<string, Theme> = {
 
 const fallbackTheme: Theme = { a: "#7291aa", b: "#95b1c8", c: "#586f85" };
 
-export const AppCard = ({ app, launching, lastLaunchedAt, onLaunch, onInspect }: AppCardProps) => {
+export const AppCard = ({ app, launching, onLaunch, onInspect }: AppCardProps) => {
   const theme = THEME_BY_CATEGORY[app.categoryId] ?? fallbackTheme;
 
   const style = {
@@ -55,27 +53,9 @@ export const AppCard = ({ app, launching, lastLaunchedAt, onLaunch, onInspect }:
       <div className="app-card__head">
         <AppIcon appId={app.id} icon={app.icon} title={app.title} />
 
-        <div>
+        <div className="app-card__title">
           <h4>{app.title}</h4>
-          <p>{app.description ?? "No description"}</p>
         </div>
-
-        <span className={`state-pill ${app.installed ? "state-pill--ok" : "state-pill--warn"}`}>
-          {app.installed ? "Ready" : "Missing"}
-        </span>
-      </div>
-
-      <div className="tag-row">
-        {app.tags.slice(0, 3).map((tag) => (
-          <span key={`${app.id}-${tag}`} className="tag-pill">
-            #{tag}
-          </span>
-        ))}
-        {app.requiresAdmin ? <span className="tag-pill tag-pill--warn">admin</span> : null}
-      </div>
-
-      <div className="app-card__meta">
-        <small>{lastLaunchedAt ? `Last launch ${formatRelativeTime(lastLaunchedAt)}` : "Never launched"}</small>
       </div>
 
       <div className="app-card__actions">

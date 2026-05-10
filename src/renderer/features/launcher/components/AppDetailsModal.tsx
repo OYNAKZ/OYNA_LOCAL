@@ -1,6 +1,5 @@
-﻿import type { LauncherApp } from "@shared/schemas/catalog";
+import type { LauncherApp } from "@shared/schemas/catalog";
 import { Modal } from "@renderer/features/launcher/components/Modal";
-import { formatRelativeTime } from "@renderer/features/launcher/utils/time";
 
 interface AppDetailsModalProps {
   open: boolean;
@@ -14,7 +13,6 @@ interface AppDetailsModalProps {
 export const AppDetailsModal = ({
   open,
   app,
-  lastLaunchedAt,
   launchingAppId,
   onClose,
   onLaunch
@@ -24,7 +22,6 @@ export const AppDetailsModal = ({
   }
 
   const launching = launchingAppId === app.id;
-  const launchLabel = lastLaunchedAt ? formatRelativeTime(lastLaunchedAt) : "never launched";
 
   return (
     <Modal
@@ -55,10 +52,6 @@ export const AppDetailsModal = ({
           <small>Category</small>
           <strong>{app.categoryId}</strong>
         </div>
-        <div>
-          <small>Last launch</small>
-          <strong>{launchLabel}</strong>
-        </div>
       </div>
 
       <div className="tag-row">
@@ -67,7 +60,6 @@ export const AppDetailsModal = ({
             #{tag}
           </span>
         ))}
-        {app.requiresAdmin ? <span className="tag-pill tag-pill--warn">admin</span> : null}
       </div>
     </Modal>
   );

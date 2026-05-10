@@ -9,6 +9,11 @@ import {
 } from "@shared/schemas/actions";
 import { catalogSnapshotSchema } from "@shared/schemas/catalog";
 import { resultSchema } from "@shared/schemas/common";
+import {
+  seatSessionSnapshotSchema,
+  sessionInfoSchema,
+  userInfoSchema
+} from "@shared/schemas/auth";
 
 export const launchAppRequestSchema = z.object({
   appId: z.string().min(1)
@@ -41,7 +46,29 @@ export const actionResponseSchema = resultSchema(
   })
 );
 
+export const authLoginRequestSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(1)
+});
+
+export const authStartSessionRequestSchema = z.object({
+  reservationId: z.number().int().positive()
+});
+
+export const authEndSessionRequestSchema = z.object({
+  sessionId: z.number().int().positive()
+});
+
+export const authMeResponseSchema = resultSchema(userInfoSchema);
+export const authLoginResponseSchema = resultSchema(userInfoSchema);
+export const authLogoutResponseSchema = resultSchema(z.object({ ok: z.literal(true) }));
+export const seatSessionResponseSchema = resultSchema(seatSessionSnapshotSchema);
+export const sessionResponseSchema = resultSchema(sessionInfoSchema);
+
 export type LaunchAppRequest = z.infer<typeof launchAppRequestSchema>;
 export type RunSystemActionRequest = z.infer<typeof runSystemActionRequestSchema>;
 export type RunAdminActionRequest = z.infer<typeof runAdminActionRequestSchema>;
 export type SetAdminStateRequest = z.infer<typeof setAdminStateRequestSchema>;
+export type AuthLoginRequest = z.infer<typeof authLoginRequestSchema>;
+export type AuthStartSessionRequest = z.infer<typeof authStartSessionRequestSchema>;
+export type AuthEndSessionRequest = z.infer<typeof authEndSessionRequestSchema>;

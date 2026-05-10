@@ -8,11 +8,19 @@ import {
   actionResponseSchema,
   adminActionsResponseSchema,
   adminStateResponseSchema,
+  authEndSessionRequestSchema,
+  authLoginRequestSchema,
+  authLoginResponseSchema,
+  authLogoutResponseSchema,
+  authMeResponseSchema,
+  authStartSessionRequestSchema,
   catalogResponseSchema,
   launchAppRequestSchema,
   launchResponseSchema,
   runAdminActionRequestSchema,
   runSystemActionRequestSchema,
+  seatSessionResponseSchema,
+  sessionResponseSchema,
   setAdminStateRequestSchema,
   systemActionsResponseSchema
 } from "@shared/ipc/contracts";
@@ -44,7 +52,8 @@ export const registerIpcHandlers = (context: AppContext): void => {
     launchApplicationService,
     systemActionsService,
     adminActionsService,
-    adminModeService
+    adminModeService,
+    authSessionService
   } = context.services;
 
   handle(
@@ -116,6 +125,57 @@ export const registerIpcHandlers = (context: AppContext): void => {
     setAdminStateRequestSchema,
     adminStateResponseSchema,
     async (payload) => adminModeService.setAdminModeEnabled(payload.adminModeEnabled),
+    context
+  );
+
+  handle(
+    IPC_CHANNELS.authLogin,
+    authLoginRequestSchema,
+    authLoginResponseSchema,
+    async (payload) => authSessionService.login(payload.email, payload.password),
+    context
+  );
+
+  handle(
+    IPC_CHANNELS.authLogout,
+    null,
+    authLogoutResponseSchema,
+    async () => {
+      authSessionService.logout();
+      return { ok: true as const };
+    },
+    context
+  );
+
+  handle(
+    IPC_CHANNELS.authMe,
+    null,
+    authMeResponseSchema,
+    async () => authSessionService.getCurrentUser(),
+    context
+  );
+
+  handle(
+    IPC_CHANNELS.authGetSeatSession,
+    null,
+    seatSessionResponseSchema,
+    async () => authSessionService.getSeatSessionSnapshot(),
+    context
+  );
+
+  handle(
+    IPC_CHANNELS.authStartSession,
+    authStartSessionRequestSchema,
+    sessionResponseSchema,
+    async (payload) => authSessionService.startSession(payload.reservationId),
+    context
+  );
+
+  handle(
+    IPC_CHANNELS.authEndSession,
+    authEndSessionRequestSchema,
+    sessionResponseSchema,
+    async (payload) => authSessionService.endSession(payload.sessionId),
     context
   );
 };

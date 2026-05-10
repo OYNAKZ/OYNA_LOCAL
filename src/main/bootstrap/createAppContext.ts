@@ -9,6 +9,8 @@ import { createLoggerService } from "@main/services/logging/logger";
 import { InstalledStateService } from "@main/services/launcher/installedStateService";
 import { LaunchApplicationService } from "@main/services/launcher/launchApplicationService";
 import { ProcessLauncherService } from "@main/services/launcher/processLauncherService";
+import { BackendClient } from "@main/services/backend/backendClient";
+import { AuthSessionService } from "@main/services/backend/authSessionService";
 import { ElectronStoreLauncherStorage } from "@main/services/storage/electronStoreStorage";
 import { LauncherStateService } from "@main/services/storage/launcherStateService";
 import { AdminActionsService } from "@main/services/system/adminActionsService";
@@ -25,6 +27,7 @@ export interface AppContext {
     adminActionsService: AdminActionsService;
     adminModeService: AdminModeService;
     hubAgentService: HubAgentService;
+    authSessionService: AuthSessionService;
   };
 }
 
@@ -46,6 +49,12 @@ export const createAppContext = (): AppContext => {
     processLauncherService,
     stateService
   );
+  const backendClient = new BackendClient();
+  const authSessionService = new AuthSessionService(backendClient, {
+    get: (key) => storage.kvGet(key),
+    set: (key, value) => storage.kvSet(key, value),
+    delete: (key) => storage.kvDelete(key)
+  });
   const systemActionsService = new SystemActionsService(logger);
   const adminModeService = new AdminModeService(stateService);
   const adminActionsService = new AdminActionsService(
@@ -73,7 +82,8 @@ export const createAppContext = (): AppContext => {
       systemActionsService,
       adminActionsService,
       adminModeService,
-      hubAgentService
+      hubAgentService,
+      authSessionService
     }
   };
 };

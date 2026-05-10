@@ -402,3 +402,175 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ── Login screen ── */
+.login-screen {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 80;
+}
+
+.login-screen__card {
+  position: relative;
+  z-index: 1;
+  width: 360px;
+  background: linear-gradient(180deg, rgba(21, 30, 42, 0.97), rgba(15, 22, 31, 0.97));
+  border: 1px solid color-mix(in srgb, var(--line), #546478 22%);
+  border-radius: var(--radius-lg, 10px);
+  padding: 32px 28px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
+}
+
+.login-screen__brand {
+  text-align: center;
+}
+
+.login-screen__brand h1 {
+  margin: 4px 0 0;
+  font-size: 28px;
+  letter-spacing: 0.08em;
+}
+
+.login-screen__subtitle {
+  margin: 6px 0 0;
+  color: var(--text-soft);
+  font-size: 13px;
+}
+
+.login-screen__form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.login-screen__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.login-screen__field label {
+  font-size: 12px;
+  color: var(--text-soft);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.login-screen__field input {
+  background: rgba(12, 18, 26, 0.86);
+  border: 1px solid color-mix(in srgb, var(--line), #4f637d 24%);
+  border-radius: var(--radius-md, 6px);
+  color: var(--text-strong);
+  font-size: 14px;
+  padding: 10px 12px;
+  outline: none;
+  transition: border-color 120ms ease;
+}
+
+.login-screen__field input:focus {
+  border-color: color-mix(in srgb, var(--accent-cyan), #6dc9e0 40%);
+}
+
+.login-screen__field input:disabled {
+  opacity: 0.5;
+}
+
+.login-screen__error {
+  background: rgba(180, 40, 50, 0.18);
+  border: 1px solid color-mix(in srgb, var(--accent-red), var(--line) 50%);
+  border-radius: 4px;
+  color: #ffb0b6;
+  font-size: 13px;
+  padding: 8px 10px;
+}
+
+.login-screen__submit {
+  margin-top: 4px;
+  width: 100%;
+  padding: 11px;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+}
+
+/* ── Session strip in topbar ── */
+.oyna-session-strip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border: 1px solid color-mix(in srgb, var(--line), #506278 22%);
+  border-radius: var(--radius-md, 6px);
+  background: rgba(14, 20, 28, 0.7);
+  flex-wrap: wrap;
+}
+
+.session-guest {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-strong);
+}
+
+.session-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 99px;
+  border: 1px solid transparent;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.session-badge--active {
+  background: rgba(22, 101, 52, 0.35);
+  border-color: #4ade80;
+  color: #86efac;
+}
+
+.session-badge--upcoming {
+  background: rgba(29, 78, 216, 0.3);
+  border-color: #60a5fa;
+  color: #bfdbfe;
+}
+
+.session-badge--default {
+  background: rgba(55, 65, 81, 0.4);
+  border-color: #6b7280;
+  color: #d1d5db;
+}
+
+.session-elapsed {
+  font-family: var(--font-display, monospace);
+  font-size: 15px;
+  font-weight: 700;
+  color: #60a5fa;
+  letter-spacing: 0.04em;
+}
+
+.session-end-label {
+  font-size: 12px;
+  color: var(--text-soft);
+}
+
+.session-action-btn {
+  font-size: 12px;
+  padding: 4px 10px;
+}
+
+.session-action-btn--end {
+  border-color: color-mix(in srgb, var(--accent-red), var(--line) 50%);
+  color: #fca5a5;
+}
+
+.topbar-user {
+  font-size: 12px;
+  color: var(--text-soft);
+  padding: 4px 8px;
+  border: 1px solid color-mix(in srgb, var(--line), #4f617a 20%);
+  border-radius: 99px;
+}

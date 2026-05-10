@@ -5,7 +5,6 @@ interface SessionSnapshotPanelProps {
   walletLabel: string;
   installedApps: number;
   totalApps: number;
-  adminModeEnabled: boolean;
 }
 
 const toneLabels = {
@@ -18,8 +17,7 @@ export const SessionSnapshotPanel = ({
   entries,
   walletLabel,
   installedApps,
-  totalApps,
-  adminModeEnabled
+  totalApps
 }: SessionSnapshotPanelProps) => {
   const counts = {
     success: entries.filter((entry) => entry.tone === "success").length,
@@ -52,11 +50,6 @@ export const SessionSnapshotPanel = ({
         <article className="session-tile session-tile--events">
           <small>Events</small>
           <strong>{entries.length}</strong>
-        </article>
-
-        <article className={`session-tile ${adminModeEnabled ? "session-tile--admin-on" : "session-tile--admin-off"}`}>
-          <small>Admin</small>
-          <strong>{adminModeEnabled ? "ON" : "OFF"}</strong>
         </article>
       </div>
 

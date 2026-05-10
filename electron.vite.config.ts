@@ -7,6 +7,14 @@ const r = (value: string) => resolve(process.cwd(), value);
 export default defineConfig({
   main: {
     plugins: [externalizeDepsPlugin()],
+    build: {
+      rollupOptions: {
+        output: {
+          format: "cjs",
+          entryFileNames: "[name].cjs"
+        }
+      }
+    },
     resolve: {
       alias: {
         "@main": r("src/main"),

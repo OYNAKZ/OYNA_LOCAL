@@ -25,19 +25,75 @@ const getFallbackPreset = (title: string): IconPreset => ({
 
 const isImageIcon = (icon: string): boolean =>
   icon.startsWith("data:") ||
+  icon.startsWith("http://") ||
+  icon.startsWith("https://") ||
   icon.startsWith("/") ||
   icon.startsWith("./") ||
   /\.(svg|png|jpg|jpeg|webp)$/i.test(icon);
 
+const SIMPLE_ICON_SLUGS: Record<string, string> = {
+  chrome: "googlechrome",
+  discord: "discord",
+  steam: "steam",
+  epic: "epicgames",
+  "epic-games": "epicgames",
+  riot: "riotgames",
+  "riot-client": "riotgames",
+  valorant: "valorant",
+  "counter-strike-2": "counterstrike",
+  cs2: "counterstrike",
+  "dota-2": "dota2",
+  dota: "dota2",
+  "league-of-legends": "leagueoflegends",
+  league: "leagueoflegends",
+  fortnite: "fortnite",
+  minecraft: "minecraft",
+  roblox: "roblox",
+  pubg: "pubg",
+  faceit: "faceit",
+  "geforce-now": "nvidia",
+  geforce: "nvidia",
+  battlenet: "battle.net",
+  ubisoft: "ubisoft",
+  "ubisoft-connect": "ubisoft",
+  ea: "ea",
+  "ea-app": "ea",
+  telegram: "telegram",
+  teamspeak: "teamspeak",
+  spotify: "spotify",
+  youtube: "youtube",
+  twitch: "twitch",
+  obs: "obsstudio",
+  "obs-studio": "obsstudio",
+  vlc: "vlcmediaplayer",
+  opera: "operagx",
+  "opera-gx": "operagx",
+  powershell: "powershell",
+  vscode: "visualstudiocode",
+  "visual-studio-code": "visualstudiocode",
+  firefox: "firefoxbrowser",
+  whatsapp: "whatsapp",
+  zoom: "zoom",
+  medal: "medal"
+};
+
+const resolveBrandIcon = (appId: string, icon?: string): string | null => {
+  const key = (icon ?? appId).toLowerCase();
+  const slug = SIMPLE_ICON_SLUGS[key] ?? SIMPLE_ICON_SLUGS[appId.toLowerCase()];
+  return slug ? `https://cdn.simpleicons.org/${slug}` : null;
+};
+
 export const AppIcon = ({ appId, icon, title }: AppIconProps) => {
   const [imageFailed, setImageFailed] = useState(false);
+  const brandIcon = resolveBrandIcon(appId, icon);
+  const imageSource = icon && isImageIcon(icon) ? icon : brandIcon;
 
-  if (icon && !imageFailed && isImageIcon(icon)) {
+  if (imageSource && !imageFailed) {
     return (
       <span className="app-icon app-icon--image-wrap" aria-label={`${title} icon`}>
         <img
           className="app-icon__image"
-          src={icon}
+          src={imageSource}
           alt=""
           onError={() => {
             setImageFailed(true);

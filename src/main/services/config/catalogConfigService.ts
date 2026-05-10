@@ -58,7 +58,7 @@ export class CatalogConfigService {
     let parsedJson: unknown;
 
     try {
-      parsedJson = JSON.parse(content);
+      parsedJson = JSON.parse(content.replace(/^\uFEFF/, ""));
     } catch (error) {
       throw new LauncherError("CATALOG_PARSE_FAILED", `Catalog JSON is invalid: ${path}`, {
         cause: error

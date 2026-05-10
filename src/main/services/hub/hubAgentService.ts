@@ -147,7 +147,11 @@ export class HubAgentService {
 
   private pollTimer: NodeJS.Timeout | null = null;
 
+  private reconnectTimer: NodeJS.Timeout | null = null;
+
   private running = false;
+
+  private registered = false;
 
   private pollingInFlight = false;
 
@@ -178,27 +182,17 @@ export class HubAgentService {
     }
 
     this.running = true;
-
-    try {
-      await this.register();
-      await this.sendHeartbeat();
-      this.startLoops();
-
-      this.logger.info("Hub agent started", {
-        hubBaseUrl: this.hubBaseUrl,
-        agentId: this.agentId,
-        pcName: this.pcName,
-        heartbeatEveryMs: this.heartbeatEveryMs,
-        pollCommandsEveryMs: this.pollCommandsEveryMs
-      });
-    } catch (error) {
-      this.running = false;
-      throw error;
-    }
+    await this.tryConnect();
   }
 
   public stop(): void {
     this.running = false;
+    this.registered = false;
+
+    if (this.reconnectTimer) {
+      clearInterval(this.reconnectTimer);
+      this.reconnectTimer = null;
+    }
 
     if (this.heartbeatTimer) {
       clearInterval(this.heartbeatTimer);
@@ -215,6 +209,50 @@ export class HubAgentService {
     });
   }
 
+  private async tryConnect(): Promise<void> {
+    try {
+      await this.register();
+      await this.sendHeartbeat();
+      this.registered = true;
+      this.startLoops();
+
+      this.logger.info("Hub agent started", {
+        hubBaseUrl: this.hubBaseUrl,
+        agentId: this.agentId,
+        pcName: this.pcName,
+        heartbeatEveryMs: this.heartbeatEveryMs,
+        pollCommandsEveryMs: this.pollCommandsEveryMs
+      });
+    } catch (error) {
+      this.registered = false;
+      this.logger.warn("Hub agent connection failed", {
+        hubBaseUrl: this.hubBaseUrl,
+        agentId: this.agentId,
+        error: error instanceof Error ? error.message : String(error)
+      });
+      this.startReconnectLoop();
+    }
+  }
+
+  private startReconnectLoop(): void {
+    if (!this.running || this.reconnectTimer) {
+      return;
+    }
+
+    this.reconnectTimer = setInterval(() => {
+      if (!this.running || this.registered) {
+        if (this.reconnectTimer) {
+          clearInterval(this.reconnectTimer);
+          this.reconnectTimer = null;
+        }
+        return;
+      }
+
+      void this.tryConnect();
+    }, this.heartbeatEveryMs);
+    this.reconnectTimer.unref();
+  }
+
   private startLoops(): void {
     if (this.heartbeatTimer) {
       clearInterval(this.heartbeatTimer);
@@ -222,6 +260,11 @@ export class HubAgentService {
 
     if (this.pollTimer) {
       clearInterval(this.pollTimer);
+    }
+
+    if (this.reconnectTimer) {
+      clearInterval(this.reconnectTimer);
+      this.reconnectTimer = null;
     }
 
     this.heartbeatTimer = setInterval(() => {
@@ -236,13 +279,15 @@ export class HubAgentService {
   }
 
   private async safeHeartbeat(): Promise<void> {
-    if (!this.running) {
+    if (!this.running || !this.registered) {
       return;
     }
 
     try {
       await this.sendHeartbeat();
     } catch (error) {
+      this.registered = false;
+      this.startReconnectLoop();
       this.logger.warn("Hub heartbeat failed", {
         error: error instanceof Error ? error.message : String(error)
       });
@@ -250,7 +295,7 @@ export class HubAgentService {
   }
 
   private async safePollCommands(): Promise<void> {
-    if (!this.running || this.pollingInFlight) {
+    if (!this.running || !this.registered || this.pollingInFlight) {
       return;
     }
 

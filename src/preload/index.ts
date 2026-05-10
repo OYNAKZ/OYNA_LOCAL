@@ -7,8 +7,13 @@ import {
   actionResponseSchema,
   adminActionsResponseSchema,
   adminStateResponseSchema,
+  authLoginResponseSchema,
+  authLogoutResponseSchema,
+  authMeResponseSchema,
   catalogResponseSchema,
   launchResponseSchema,
+  seatSessionResponseSchema,
+  sessionResponseSchema,
   systemActionsResponseSchema
 } from "@shared/ipc/contracts";
 import type { Result } from "@shared/schemas/common";
@@ -38,9 +43,16 @@ const api: LauncherApi = {
     }),
   getAdminState: () => invoke(IPC_CHANNELS.adminStateGet, adminStateResponseSchema),
   setAdminState: (adminModeEnabled) =>
-    invoke(IPC_CHANNELS.adminStateSet, adminStateResponseSchema, {
-      adminModeEnabled
-    })
+    invoke(IPC_CHANNELS.adminStateSet, adminStateResponseSchema, { adminModeEnabled }),
+  authLogin: (email, password) =>
+    invoke(IPC_CHANNELS.authLogin, authLoginResponseSchema, { email, password }),
+  authLogout: () => invoke(IPC_CHANNELS.authLogout, authLogoutResponseSchema),
+  authMe: () => invoke(IPC_CHANNELS.authMe, authMeResponseSchema),
+  authGetSeatSession: () => invoke(IPC_CHANNELS.authGetSeatSession, seatSessionResponseSchema),
+  authStartSession: (reservationId) =>
+    invoke(IPC_CHANNELS.authStartSession, sessionResponseSchema, { reservationId }),
+  authEndSession: (sessionId) =>
+    invoke(IPC_CHANNELS.authEndSession, sessionResponseSchema, { sessionId })
 };
 
 contextBridge.exposeInMainWorld("launcherApi", api);

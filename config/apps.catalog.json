@@ -1,5 +1,5 @@
 ﻿{
-  "version": "1.1.0",
+  "version": "1.2.0",
   "categories": [
     {
       "id": "core",
@@ -90,22 +90,15 @@
     {
       "id": "chrome",
       "title": "Google Chrome",
-      "description": "Web browser",
+      "description": "Web browser demo app",
       "categoryId": "core",
       "icon": "chrome",
       "tags": ["browser", "web"],
       "requiresAdmin": false,
       "launch": {
-        "executable": "%ProgramFiles%\\Google\\Chrome\\Application\\chrome.exe",
+        "executable": "oyna://mock/chrome",
         "args": [],
         "useShell": false
-      },
-      "installDetection": {
-        "type": "pathExists",
-        "paths": [
-          "%ProgramFiles%\\Google\\Chrome\\Application\\chrome.exe",
-          "%ProgramFiles(x86)%\\Google\\Chrome\\Application\\chrome.exe"
-        ]
       }
     },
     {
@@ -135,37 +128,23 @@
       "tags": ["code", "editor", "typescript"],
       "requiresAdmin": false,
       "launch": {
-        "executable": "%LOCALAPPDATA%\\Programs\\Microsoft VS Code\\Code.exe",
+        "executable": "oyna://mock/vscode",
         "args": [],
         "useShell": false
-      },
-      "installDetection": {
-        "type": "pathExists",
-        "paths": [
-          "%LOCALAPPDATA%\\Programs\\Microsoft VS Code\\Code.exe",
-          "%ProgramFiles%\\Microsoft VS Code\\Code.exe"
-        ]
       }
     },
     {
       "id": "discord",
       "title": "Discord",
-      "description": "Voice and text communication",
+      "description": "Voice and text communication demo app",
       "categoryId": "communication",
       "icon": "discord",
       "tags": ["voice", "chat", "community"],
       "requiresAdmin": false,
       "launch": {
-        "executable": "%LOCALAPPDATA%\\Discord\\Update.exe",
-        "args": ["--processStart", "Discord.exe"],
+        "executable": "oyna://mock/discord",
+        "args": [],
         "useShell": false
-      },
-      "installDetection": {
-        "type": "pathExists",
-        "paths": [
-          "%LOCALAPPDATA%\\Discord\\Update.exe",
-          "%LOCALAPPDATA%\\Discord\\app-1.0.9009\\Discord.exe"
-        ]
       }
     },
     {
@@ -177,16 +156,9 @@
       "tags": ["games", "launcher", "store"],
       "requiresAdmin": false,
       "launch": {
-        "executable": "%ProgramFiles(x86)%\\Steam\\Steam.exe",
+        "executable": "oyna://mock/steam",
         "args": [],
         "useShell": false
-      },
-      "installDetection": {
-        "type": "pathExists",
-        "paths": [
-          "%ProgramFiles(x86)%\\Steam\\Steam.exe",
-          "%ProgramFiles%\\Steam\\Steam.exe"
-        ]
       }
     },
     {
@@ -198,16 +170,9 @@
       "tags": ["games", "launcher", "epic"],
       "requiresAdmin": false,
       "launch": {
-        "executable": "%ProgramFiles(x86)%\\Epic Games\\Launcher\\Portal\\Binaries\\Win64\\EpicGamesLauncher.exe",
+        "executable": "oyna://mock/epic-games",
         "args": [],
         "useShell": false
-      },
-      "installDetection": {
-        "type": "pathExists",
-        "paths": [
-          "%ProgramFiles(x86)%\\Epic Games\\Launcher\\Portal\\Binaries\\Win64\\EpicGamesLauncher.exe",
-          "%ProgramFiles%\\Epic Games\\Launcher\\Portal\\Binaries\\Win64\\EpicGamesLauncher.exe"
-        ]
       }
     },
     {
@@ -219,16 +184,9 @@
       "tags": ["games", "valorant", "league"],
       "requiresAdmin": false,
       "launch": {
-        "executable": "%LOCALAPPDATA%\\Riot Games\\Riot Client\\RiotClientServices.exe",
+        "executable": "oyna://mock/riot-client",
         "args": [],
         "useShell": false
-      },
-      "installDetection": {
-        "type": "pathExists",
-        "paths": [
-          "%LOCALAPPDATA%\\Riot Games\\Riot Client\\RiotClientServices.exe",
-          "%ProgramFiles%\\Riot Games\\Riot Client\\RiotClientServices.exe"
-        ]
       }
     },
     {
@@ -240,16 +198,9 @@
       "tags": ["games", "blizzard"],
       "requiresAdmin": false,
       "launch": {
-        "executable": "%ProgramFiles(x86)%\\Battle.net\\Battle.net Launcher.exe",
+        "executable": "oyna://mock/battlenet",
         "args": [],
         "useShell": false
-      },
-      "installDetection": {
-        "type": "pathExists",
-        "paths": [
-          "%ProgramFiles(x86)%\\Battle.net\\Battle.net Launcher.exe",
-          "%ProgramFiles%\\Battle.net\\Battle.net Launcher.exe"
-        ]
       }
     },
     {
@@ -261,16 +212,9 @@
       "tags": ["games", "ubisoft"],
       "requiresAdmin": false,
       "launch": {
-        "executable": "%ProgramFiles(x86)%\\Ubisoft\\Ubisoft Game Launcher\\UbisoftConnect.exe",
+        "executable": "oyna://mock/ubisoft-connect",
         "args": [],
         "useShell": false
-      },
-      "installDetection": {
-        "type": "pathExists",
-        "paths": [
-          "%ProgramFiles(x86)%\\Ubisoft\\Ubisoft Game Launcher\\UbisoftConnect.exe",
-          "%ProgramFiles%\\Ubisoft\\Ubisoft Game Launcher\\UbisoftConnect.exe"
-        ]
       }
     },
     {
@@ -282,16 +226,9 @@
       "tags": ["games", "ea"],
       "requiresAdmin": false,
       "launch": {
-        "executable": "%ProgramFiles%\\Electronic Arts\\EA Desktop\\EA Desktop\\EADesktop.exe",
+        "executable": "oyna://mock/ea-app",
         "args": [],
         "useShell": false
-      },
-      "installDetection": {
-        "type": "pathExists",
-        "paths": [
-          "%ProgramFiles%\\Electronic Arts\\EA Desktop\\EA Desktop\\EADesktop.exe",
-          "%ProgramFiles(x86)%\\Electronic Arts\\EA Desktop\\EA Desktop\\EADesktop.exe"
-        ]
       }
     },
     {
@@ -303,16 +240,9 @@
       "tags": ["chat", "messenger"],
       "requiresAdmin": false,
       "launch": {
-        "executable": "%APPDATA%\\Telegram Desktop\\Telegram.exe",
+        "executable": "oyna://mock/telegram",
         "args": [],
         "useShell": false
-      },
-      "installDetection": {
-        "type": "pathExists",
-        "paths": [
-          "%APPDATA%\\Telegram Desktop\\Telegram.exe",
-          "%LOCALAPPDATA%\\Telegram Desktop\\Telegram.exe"
-        ]
       }
     },
     {
@@ -324,16 +254,9 @@
       "tags": ["voice", "chat"],
       "requiresAdmin": false,
       "launch": {
-        "executable": "%ProgramFiles%\\TeamSpeak\\ts3client_win64.exe",
+        "executable": "oyna://mock/teamspeak",
         "args": [],
         "useShell": false
-      },
-      "installDetection": {
-        "type": "pathExists",
-        "paths": [
-          "%ProgramFiles%\\TeamSpeak\\ts3client_win64.exe",
-          "%ProgramFiles(x86)%\\TeamSpeak\\ts3client_win64.exe"
-        ]
       }
     },
     {
@@ -345,13 +268,9 @@
       "tags": ["music", "audio"],
       "requiresAdmin": false,
       "launch": {
-        "executable": "%APPDATA%\\Spotify\\Spotify.exe",
+        "executable": "oyna://mock/spotify",
         "args": [],
         "useShell": false
-      },
-      "installDetection": {
-        "type": "pathExists",
-        "paths": ["%APPDATA%\\Spotify\\Spotify.exe"]
       }
     },
     {
@@ -363,16 +282,9 @@
       "tags": ["stream", "recording", "video"],
       "requiresAdmin": false,
       "launch": {
-        "executable": "%ProgramFiles%\\obs-studio\\bin\\64bit\\obs64.exe",
+        "executable": "oyna://mock/obs-studio",
         "args": [],
         "useShell": false
-      },
-      "installDetection": {
-        "type": "pathExists",
-        "paths": [
-          "%ProgramFiles%\\obs-studio\\bin\\64bit\\obs64.exe",
-          "%ProgramFiles(x86)%\\obs-studio\\bin\\64bit\\obs64.exe"
-        ]
       }
     },
     {
@@ -384,16 +296,9 @@
       "tags": ["video", "media", "player"],
       "requiresAdmin": false,
       "launch": {
-        "executable": "%ProgramFiles%\\VideoLAN\\VLC\\vlc.exe",
+        "executable": "oyna://mock/vlc",
         "args": [],
         "useShell": false
-      },
-      "installDetection": {
-        "type": "pathExists",
-        "paths": [
-          "%ProgramFiles%\\VideoLAN\\VLC\\vlc.exe",
-          "%ProgramFiles(x86)%\\VideoLAN\\VLC\\vlc.exe"
-        ]
       }
     },
     {
@@ -405,13 +310,9 @@
       "tags": ["browser", "gaming"],
       "requiresAdmin": false,
       "launch": {
-        "executable": "%LOCALAPPDATA%\\Programs\\Opera GX\\launcher.exe",
+        "executable": "oyna://mock/opera-gx",
         "args": [],
         "useShell": false
-      },
-      "installDetection": {
-        "type": "pathExists",
-        "paths": ["%LOCALAPPDATA%\\Programs\\Opera GX\\launcher.exe"]
       }
     },
     {
@@ -423,16 +324,219 @@
       "tags": ["browser", "web"],
       "requiresAdmin": false,
       "launch": {
-        "executable": "%ProgramFiles%\\Mozilla Firefox\\firefox.exe",
+        "executable": "oyna://mock/firefox",
         "args": [],
         "useShell": false
-      },
-      "installDetection": {
-        "type": "pathExists",
-        "paths": [
-          "%ProgramFiles%\\Mozilla Firefox\\firefox.exe",
-          "%ProgramFiles(x86)%\\Mozilla Firefox\\firefox.exe"
-        ]
+      }
+    },
+    {
+      "id": "valorant",
+      "title": "VALORANT",
+      "description": "Tactical shooter demo app",
+      "categoryId": "gaming",
+      "icon": "valorant",
+      "tags": ["games", "shooter", "riot", "fps"],
+      "requiresAdmin": false,
+      "launch": {
+        "executable": "oyna://mock/valorant",
+        "args": [],
+        "useShell": false
+      }
+    },
+    {
+      "id": "counter-strike-2",
+      "title": "Counter-Strike 2",
+      "description": "Competitive FPS demo app",
+      "categoryId": "gaming",
+      "icon": "cs2",
+      "tags": ["games", "shooter", "steam", "fps"],
+      "requiresAdmin": false,
+      "launch": {
+        "executable": "oyna://mock/counter-strike-2",
+        "args": [],
+        "useShell": false
+      }
+    },
+    {
+      "id": "dota-2",
+      "title": "Dota 2",
+      "description": "MOBA demo app",
+      "categoryId": "gaming",
+      "icon": "dota",
+      "tags": ["games", "moba", "steam"],
+      "requiresAdmin": false,
+      "launch": {
+        "executable": "oyna://mock/dota-2",
+        "args": [],
+        "useShell": false
+      }
+    },
+    {
+      "id": "league-of-legends",
+      "title": "League of Legends",
+      "description": "MOBA demo app",
+      "categoryId": "gaming",
+      "icon": "league",
+      "tags": ["games", "moba", "riot"],
+      "requiresAdmin": false,
+      "launch": {
+        "executable": "oyna://mock/league-of-legends",
+        "args": [],
+        "useShell": false
+      }
+    },
+    {
+      "id": "fortnite",
+      "title": "Fortnite",
+      "description": "Battle royale demo app",
+      "categoryId": "gaming",
+      "icon": "fortnite",
+      "tags": ["games", "battle royale", "epic"],
+      "requiresAdmin": false,
+      "launch": {
+        "executable": "oyna://mock/fortnite",
+        "args": [],
+        "useShell": false
+      }
+    },
+    {
+      "id": "minecraft",
+      "title": "Minecraft",
+      "description": "Sandbox game demo app",
+      "categoryId": "gaming",
+      "icon": "minecraft",
+      "tags": ["games", "sandbox", "creative"],
+      "requiresAdmin": false,
+      "launch": {
+        "executable": "oyna://mock/minecraft",
+        "args": [],
+        "useShell": false
+      }
+    },
+    {
+      "id": "roblox",
+      "title": "Roblox",
+      "description": "Game platform demo app",
+      "categoryId": "gaming",
+      "icon": "roblox",
+      "tags": ["games", "platform", "casual"],
+      "requiresAdmin": false,
+      "launch": {
+        "executable": "oyna://mock/roblox",
+        "args": [],
+        "useShell": false
+      }
+    },
+    {
+      "id": "pubg",
+      "title": "PUBG",
+      "description": "Battle royale demo app",
+      "categoryId": "gaming",
+      "icon": "pubg",
+      "tags": ["games", "battle royale", "shooter"],
+      "requiresAdmin": false,
+      "launch": {
+        "executable": "oyna://mock/pubg",
+        "args": [],
+        "useShell": false
+      }
+    },
+    {
+      "id": "faceit",
+      "title": "FACEIT",
+      "description": "Competitive matchmaking demo app",
+      "categoryId": "gaming",
+      "icon": "faceit",
+      "tags": ["games", "esports", "matchmaking"],
+      "requiresAdmin": false,
+      "launch": {
+        "executable": "oyna://mock/faceit",
+        "args": [],
+        "useShell": false
+      }
+    },
+    {
+      "id": "geforce-now",
+      "title": "GeForce NOW",
+      "description": "Cloud gaming demo app",
+      "categoryId": "gaming",
+      "icon": "geforce",
+      "tags": ["games", "cloud", "nvidia"],
+      "requiresAdmin": false,
+      "launch": {
+        "executable": "oyna://mock/geforce-now",
+        "args": [],
+        "useShell": false
+      }
+    },
+    {
+      "id": "youtube",
+      "title": "YouTube",
+      "description": "Video platform demo app",
+      "categoryId": "media",
+      "icon": "youtube",
+      "tags": ["video", "media", "streaming"],
+      "requiresAdmin": false,
+      "launch": {
+        "executable": "oyna://mock/youtube",
+        "args": [],
+        "useShell": false
+      }
+    },
+    {
+      "id": "twitch",
+      "title": "Twitch",
+      "description": "Live streaming demo app",
+      "categoryId": "media",
+      "icon": "twitch",
+      "tags": ["stream", "media", "gaming"],
+      "requiresAdmin": false,
+      "launch": {
+        "executable": "oyna://mock/twitch",
+        "args": [],
+        "useShell": false
+      }
+    },
+    {
+      "id": "whatsapp",
+      "title": "WhatsApp",
+      "description": "Messenger demo app",
+      "categoryId": "communication",
+      "icon": "whatsapp",
+      "tags": ["chat", "messenger", "calls"],
+      "requiresAdmin": false,
+      "launch": {
+        "executable": "oyna://mock/whatsapp",
+        "args": [],
+        "useShell": false
+      }
+    },
+    {
+      "id": "zoom",
+      "title": "Zoom",
+      "description": "Video meeting demo app",
+      "categoryId": "communication",
+      "icon": "zoom",
+      "tags": ["calls", "meetings", "video"],
+      "requiresAdmin": false,
+      "launch": {
+        "executable": "oyna://mock/zoom",
+        "args": [],
+        "useShell": false
+      }
+    },
+    {
+      "id": "medal",
+      "title": "Medal",
+      "description": "Gameplay clips demo app",
+      "categoryId": "media",
+      "icon": "medal",
+      "tags": ["clips", "recording", "gaming"],
+      "requiresAdmin": false,
+      "launch": {
+        "executable": "oyna://mock/medal",
+        "args": [],
+        "useShell": false
       }
     }
   ]

@@ -1,12 +1,13 @@
-﻿import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type { LauncherApi } from "@shared/ipc/api";
-import type { AdminActionItem, AdminState, SystemActionItem } from "@shared/schemas/actions";
+import type { SeatSessionSnapshot, SessionInfo, UserInfo } from "@shared/schemas/auth";
+import type { SystemActionItem } from "@shared/schemas/actions";
 import type { CatalogSnapshot } from "@shared/schemas/catalog";
 import type { Result } from "@shared/schemas/common";
-import { AdminPanel } from "@renderer/features/admin/AdminPanel";
 import { BillingFeature, formatMinutesAsLabel } from "@renderer/features/billing/BillingFeature";
 import { CatalogPanel } from "@renderer/features/catalog/CatalogPanel";
+import { LoginScreen } from "@renderer/features/auth/LoginScreen";
 import { AppDetailsModal } from "@renderer/features/launcher/components/AppDetailsModal";
 import { BootSplash } from "@renderer/features/launcher/components/BootSplash";
 import { CommandPaletteModal } from "@renderer/features/launcher/components/CommandPaletteModal";
@@ -18,12 +19,10 @@ import { useBootSplash } from "@renderer/features/launcher/hooks/useBootSplash";
 import { useClock } from "@renderer/features/launcher/hooks/useClock";
 import type { ActivityEntry, ToastMessage, UiTone } from "@renderer/features/launcher/types";
 import { SystemActionsPanel } from "@renderer/features/system/SystemActionsPanel";
+import { createMockLauncherApi } from "./mockLauncherApi";
 
 const unwrap = <T,>(result: Result<T>): T => {
-  if (!result.ok) {
-    throw new Error(result.error.message);
-  }
-
+  if (!result.ok) throw new Error(result.error.message);
   return result.data;
 };
 
@@ -33,27 +32,38 @@ type ToastInput = Omit<ToastMessage, "id" | "createdAt">;
 
 const resolveLauncherApi = (): LauncherApi => {
   const api = (window as Window & { launcherApi?: LauncherApi }).launcherApi;
-
-  if (!api) {
-    throw new Error("Launcher bridge is unavailable. Start the app in Electron mode.");
-  }
-
-  return api;
+  return api ?? createMockLauncherApi();
 };
 
+const formatElapsed = (startedAt: string): string => {
+  const elapsed = Math.floor((Date.now() - new Date(startedAt).getTime()) / 1000);
+  const h = Math.floor(elapsed / 3600);
+  const m = Math.floor((elapsed % 3600) / 60);
+  const s = elapsed % 60;
+  if (h > 0) return `${h}h ${String(m).padStart(2, "0")}m`;
+  return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+};
+
+type AppStage = "booting" | "login" | "launcher";
+
 export const App = () => {
+  const [stage, setStage] = useState<AppStage>("booting");
+  const [loginError, setLoginError] = useState<string | null>(null);
+  const [loginLoading, setLoginLoading] = useState(false);
+
+  const [currentUser, setCurrentUser] = useState<UserInfo | null>(null);
+  const [seatSnapshot, setSeatSnapshot] = useState<SeatSessionSnapshot | null>(null);
+  const [sessionElapsed, setSessionElapsed] = useState<string | null>(null);
+
   const [catalog, setCatalog] = useState<CatalogSnapshot | null>(null);
+  const [catalogError, setCatalogError] = useState<string | null>(null);
   const [systemActions, setSystemActions] = useState<SystemActionItem[]>([]);
-  const [adminActions, setAdminActions] = useState<AdminActionItem[]>([]);
-  const [adminState, setAdminState] = useState<AdminState | null>(null);
 
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
 
   const [launchingAppId, setLaunchingAppId] = useState<string | null>(null);
   const [runningSystemActionId, setRunningSystemActionId] = useState<string | null>(null);
-  const [runningAdminActionId, setRunningAdminActionId] = useState<string | null>(null);
-
   const [refreshingCatalog, setRefreshingCatalog] = useState(false);
   const [bootReady, setBootReady] = useState(false);
 
@@ -62,7 +72,6 @@ export const App = () => {
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [isBillingOpen, setIsBillingOpen] = useState(false);
   const [commandQuery, setCommandQuery] = useState("");
-
   const [walletMinutes, setWalletMinutes] = useState(0);
 
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
@@ -71,115 +80,186 @@ export const App = () => {
   const { visible: splashVisible, progress: splashProgress, phase: splashPhase } = useBootSplash(bootReady);
   const { dateLabel, timeLabel } = useClock();
 
-  const pushToast = useCallback((payload: ToastInput) => {
-    const nextToast: ToastMessage = {
-      id: createId(),
-      createdAt: Date.now(),
-      ...payload
-    };
+  const snapshotPollRef = useRef<number | null>(null);
 
-    setToasts((current) => [nextToast, ...current].slice(0, 5));
+  const pushToast = useCallback((payload: ToastInput) => {
+    const next: ToastMessage = { id: createId(), createdAt: Date.now(), ...payload };
+    setToasts((c) => [next, ...c].slice(0, 5));
   }, []);
 
   const dismissToast = useCallback((id: string) => {
-    setToasts((current) => current.filter((item) => item.id !== id));
+    setToasts((c) => c.filter((t) => t.id !== id));
   }, []);
 
   useEffect(() => {
-    if (toasts.length === 0) {
-      return;
-    }
-
-    const timerId = window.setInterval(() => {
+    if (toasts.length === 0) return;
+    const id = window.setInterval(() => {
       const now = Date.now();
-      setToasts((current) => current.filter((item) => now - item.createdAt < 5_000));
+      setToasts((c) => c.filter((t) => now - t.createdAt < 5_000));
     }, 400);
-
-    return () => {
-      window.clearInterval(timerId);
-    };
+    return () => window.clearInterval(id);
   }, [toasts.length]);
 
   const pushActivity = useCallback((tone: UiTone, title: string, details: string) => {
-    const nextEntry: ActivityEntry = {
-      id: createId(),
-      tone,
-      title,
-      details,
-      createdAt: Date.now()
-    };
-
-    setActivity((current) => [nextEntry, ...current].slice(0, 14));
+    const next: ActivityEntry = { id: createId(), tone, title, details, createdAt: Date.now() };
+    setActivity((c) => [next, ...c].slice(0, 14));
   }, []);
 
-  const refreshCatalog = useCallback(
-    async (options?: { silent?: boolean }) => {
-      try {
-        setRefreshingCatalog(true);
-        const api = resolveLauncherApi();
-        const refreshed = await api.refreshCatalog();
-        setCatalog(unwrap(refreshed));
+  // Session elapsed timer
+  useEffect(() => {
+    const activeSession = seatSnapshot?.session;
+    const isRunning =
+      activeSession &&
+      !activeSession.ended_at &&
+      activeSession.status !== "finished" &&
+      activeSession.status !== "completed";
 
-        if (!options?.silent) {
-          pushToast({
-            tone: "success",
-            title: "Catalog Updated",
-            message: "Launcher data has been synced."
-          });
-          pushActivity("success", "Catalog Updated", "Applications and categories were refreshed.");
-        }
-      } catch (error) {
-        const message = error instanceof Error ? error.message : "Failed to refresh catalog";
-        pushToast({
-          tone: "error",
-          title: "Refresh Error",
-          message
-        });
-        pushActivity("error", "Catalog Refresh Failed", message);
-      } finally {
-        setRefreshingCatalog(false);
-      }
-    },
-    [pushActivity, pushToast]
-  );
+    if (!isRunning) {
+      setSessionElapsed(null);
+      return;
+    }
+    const tick = () => setSessionElapsed(formatElapsed(activeSession.started_at));
+    tick();
+    const id = window.setInterval(tick, 1000);
+    return () => window.clearInterval(id);
+  }, [seatSnapshot]);
 
-  const loadInitialData = useCallback(async () => {
+  const fetchSeatSnapshot = useCallback(async () => {
+    try {
+      const result = await resolveLauncherApi().authGetSeatSession();
+      if (result.ok) setSeatSnapshot(result.data);
+    } catch {
+      // silent
+    }
+  }, []);
+
+  const startSnapshotPolling = useCallback(() => {
+    if (snapshotPollRef.current !== null) return;
+    void fetchSeatSnapshot();
+    snapshotPollRef.current = window.setInterval(() => void fetchSeatSnapshot(), 30_000);
+  }, [fetchSeatSnapshot]);
+
+  const stopSnapshotPolling = useCallback(() => {
+    if (snapshotPollRef.current !== null) {
+      window.clearInterval(snapshotPollRef.current);
+      snapshotPollRef.current = null;
+    }
+  }, []);
+
+  const loadLauncherData = useCallback(async () => {
     try {
       const api = resolveLauncherApi();
-      const [catalogResult, systemResult, adminActionsResult, adminStateResult] = await Promise.all([
-        api.getCatalog(),
-        api.getSystemActions(),
-        api.getAdminActions(),
-        api.getAdminState()
-      ]);
-
+      const [catalogResult, systemResult] = await Promise.all([api.getCatalog(), api.getSystemActions()]);
       setCatalog(unwrap(catalogResult));
       setSystemActions(unwrap(systemResult));
-      setAdminActions(unwrap(adminActionsResult));
-      setAdminState(unwrap(adminStateResult));
-
-      pushToast({
-        tone: "success",
-        title: "OYNA Ready",
-        message: "Launcher is loaded."
-      });
+      setCatalogError(null);
       pushActivity("success", "Initialization Complete", "All panels are ready.");
     } catch (error) {
       const message = error instanceof Error ? error.message : "Failed to initialize launcher";
-      pushToast({
-        tone: "error",
-        title: "Initialization Error",
-        message
-      });
+      setCatalogError(message);
       pushActivity("error", "Initialization Failed", message);
+      window.setTimeout(() => void loadLauncherData(), 2_000);
+    }
+  }, [pushActivity]);
+
+  // Boot: try to restore session from stored token
+  useEffect(() => {
+    const boot = async () => {
+      try {
+        const api = resolveLauncherApi();
+        const meResult = await api.authMe();
+        if (meResult.ok) {
+          setCurrentUser(meResult.data);
+          await loadLauncherData();
+          setStage("launcher");
+          startSnapshotPolling();
+        } else {
+          setStage("login");
+        }
+      } catch {
+        setStage("login");
+      } finally {
+        setBootReady(true);
+      }
+    };
+    void boot();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleLogin = useCallback(async (email: string, password: string) => {
+    setLoginLoading(true);
+    setLoginError(null);
+    try {
+      const api = resolveLauncherApi();
+      const result = await api.authLogin(email, password);
+      if (!result.ok) throw new Error(result.error.message);
+      setCurrentUser(result.data);
+      await loadLauncherData();
+      setStage("launcher");
+      startSnapshotPolling();
+      pushActivity("success", "Signed In", result.data.full_name ?? result.data.email);
+    } catch (error) {
+      setLoginError(error instanceof Error ? error.message : "Login failed");
     } finally {
-      setBootReady(true);
+      setLoginLoading(false);
+    }
+  }, [loadLauncherData, pushActivity, startSnapshotPolling]);
+
+  const handleLogout = useCallback(() => {
+    void resolveLauncherApi().authLogout();
+    stopSnapshotPolling();
+    setCurrentUser(null);
+    setSeatSnapshot(null);
+    setSessionElapsed(null);
+    setStage("login");
+    pushActivity("info", "Signed Out", "");
+  }, [pushActivity, stopSnapshotPolling]);
+
+  const handleStartSession = useCallback(async (reservationId: number) => {
+    try {
+      const result = await resolveLauncherApi().authStartSession(reservationId);
+      const session = unwrap(result) as SessionInfo;
+      setSeatSnapshot((prev) =>
+        prev
+          ? { ...prev, session, reservation: prev.reservation ? { ...prev.reservation, status: "session_started" } : null }
+          : prev
+      );
+      pushActivity("success", "Session Started", `Reservation #${reservationId}`);
+      pushToast({ tone: "success", title: "Session Started", message: "Timer is running." });
+    } catch (error) {
+      pushToast({ tone: "error", title: "Start Session Failed", message: error instanceof Error ? error.message : "Unknown error" });
     }
   }, [pushActivity, pushToast]);
 
-  useEffect(() => {
-    void loadInitialData();
-  }, [loadInitialData]);
+  const handleEndSession = useCallback(async (sessionId: number) => {
+    try {
+      const result = await resolveLauncherApi().authEndSession(sessionId);
+      const session = unwrap(result) as SessionInfo;
+      setSeatSnapshot((prev) => (prev ? { ...prev, session } : prev));
+      pushActivity("success", "Session Ended", `Session #${sessionId}`);
+      pushToast({ tone: "success", title: "Session Ended", message: "Have a great day!" });
+      await fetchSeatSnapshot();
+    } catch (error) {
+      pushToast({ tone: "error", title: "End Session Failed", message: error instanceof Error ? error.message : "Unknown error" });
+    }
+  }, [fetchSeatSnapshot, pushActivity, pushToast]);
+
+  const refreshCatalog = useCallback(async (options?: { silent?: boolean }) => {
+    try {
+      setRefreshingCatalog(true);
+      const refreshed = await resolveLauncherApi().refreshCatalog();
+      setCatalog(unwrap(refreshed));
+      if (!options?.silent) {
+        pushToast({ tone: "success", title: "Catalog Updated", message: "Launcher data has been synced." });
+        pushActivity("success", "Catalog Updated", "Applications and categories were refreshed.");
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to refresh catalog";
+      pushToast({ tone: "error", title: "Refresh Error", message });
+    } finally {
+      setRefreshingCatalog(false);
+    }
+  }, [pushActivity, pushToast]);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -189,197 +269,70 @@ export const App = () => {
         setIsCommandPaletteOpen(true);
       }
     };
-
     window.addEventListener("keydown", onKeyDown);
-
-    return () => {
-      window.removeEventListener("keydown", onKeyDown);
-    };
+    return () => window.removeEventListener("keydown", onKeyDown);
   }, []);
 
   const appById = useMemo(() => new Map(catalog?.apps.map((app) => [app.id, app]) ?? []), [catalog]);
 
   const recentMap = useMemo(() => {
     const map = new Map<string, string>();
-
-    for (const entry of catalog?.recent ?? []) {
-      map.set(entry.appId, entry.launchedAt);
-    }
-
+    for (const entry of catalog?.recent ?? []) map.set(entry.appId, entry.launchedAt);
     return map;
   }, [catalog]);
 
   const selectedApp = inspectAppId ? (appById.get(inspectAppId) ?? null) : null;
 
-  const handleLaunch = useCallback(
-    async (appId: string) => {
-      const appTitle = appById.get(appId)?.title ?? appId;
+  const handleLaunch = useCallback(async (appId: string) => {
+    const appTitle = appById.get(appId)?.title ?? appId;
+    try {
+      setLaunchingAppId(appId);
+      pushActivity("info", "Launch Requested", appTitle);
+      const launchResult = await resolveLauncherApi().launchApp(appId);
+      unwrap(launchResult);
+      const updatedCatalog = await resolveLauncherApi().getCatalog();
+      setCatalog(unwrap(updatedCatalog));
+      pushToast({ tone: "success", title: "Application Launched", message: `${appTitle} started successfully.` });
+      pushActivity("success", "Launch Complete", appTitle);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Launch failed";
+      pushToast({ tone: "error", title: "Launch Error", message });
+      pushActivity("error", "Launch Failed", `${appTitle}: ${message}`);
+    } finally {
+      setLaunchingAppId(null);
+    }
+  }, [appById, pushActivity, pushToast]);
 
-      try {
-        setLaunchingAppId(appId);
-        pushActivity("info", "Launch Requested", appTitle);
+  const executeSystemAction = useCallback(async (action: SystemActionItem) => {
+    try {
+      setRunningSystemActionId(action.id);
+      pushActivity("info", "System Action", action.title);
+      const result = await resolveLauncherApi().runSystemAction(action.id);
+      unwrap(result);
+      pushToast({ tone: "success", title: "Action Completed", message: action.title });
+      pushActivity("success", "System Action Completed", action.title);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "System action failed";
+      pushToast({ tone: "error", title: "System Action Error", message });
+      pushActivity("error", "System Action Failed", `${action.title}: ${message}`);
+    } finally {
+      setRunningSystemActionId(null);
+    }
+  }, [pushActivity, pushToast]);
 
-        const api = resolveLauncherApi();
-        const launchResult = await api.launchApp(appId);
-        unwrap(launchResult);
-
-        const updatedCatalog = await api.getCatalog();
-        setCatalog(unwrap(updatedCatalog));
-
-        pushToast({
-          tone: "success",
-          title: "Application Launched",
-          message: `${appTitle} started successfully.`
-        });
-        pushActivity("success", "Launch Complete", appTitle);
-      } catch (error) {
-        const message = error instanceof Error ? error.message : "Launch failed";
-        pushToast({
-          tone: "error",
-          title: "Launch Error",
-          message
-        });
-        pushActivity("error", "Launch Failed", `${appTitle}: ${message}`);
-      } finally {
-        setLaunchingAppId(null);
-      }
-    },
-    [appById, pushActivity, pushToast]
-  );
-
-  const executeSystemAction = useCallback(
-    async (action: SystemActionItem) => {
-      try {
-        setRunningSystemActionId(action.id);
-        pushActivity("info", "System Action", action.title);
-
-        const api = resolveLauncherApi();
-        const result = await api.runSystemAction(action.id);
-        unwrap(result);
-
-        pushToast({
-          tone: "success",
-          title: "Action Completed",
-          message: action.title
-        });
-        pushActivity("success", "System Action Completed", action.title);
-      } catch (error) {
-        const message = error instanceof Error ? error.message : "System action failed";
-        pushToast({
-          tone: "error",
-          title: "System Action Error",
-          message
-        });
-        pushActivity("error", "System Action Failed", `${action.title}: ${message}`);
-      } finally {
-        setRunningSystemActionId(null);
-      }
-    },
-    [pushActivity, pushToast]
-  );
-
-  const handleRunSystemAction = useCallback(
-    (action: SystemActionItem) => {
-      if (action.requiresConfirmation) {
-        setConfirmAction(action);
-        return;
-      }
-
-      void executeSystemAction(action);
-    },
-    [executeSystemAction]
-  );
+  const handleRunSystemAction = useCallback((action: SystemActionItem) => {
+    if (action.requiresConfirmation) { setConfirmAction(action); return; }
+    void executeSystemAction(action);
+  }, [executeSystemAction]);
 
   const handleConfirmSystemAction = useCallback(() => {
-    if (!confirmAction) {
-      return;
-    }
-
-    const pendingAction = confirmAction;
+    if (!confirmAction) return;
+    const pending = confirmAction;
     setConfirmAction(null);
-    void executeSystemAction(pendingAction);
+    void executeSystemAction(pending);
   }, [confirmAction, executeSystemAction]);
 
-  const handleToggleAdminMode = useCallback(
-    async (enabled: boolean) => {
-      try {
-        const api = resolveLauncherApi();
-        const result = await api.setAdminState(enabled);
-        setAdminState(unwrap(result));
-
-        pushToast({
-          tone: "info",
-          title: enabled ? "Admin Mode ON" : "Admin Mode OFF",
-          message: enabled ? "Extended commands are enabled." : "Extended commands are disabled."
-        });
-        pushActivity("info", "Admin Mode Changed", enabled ? "Enabled" : "Disabled");
-      } catch (error) {
-        const message = error instanceof Error ? error.message : "Cannot change admin mode";
-        pushToast({
-          tone: "error",
-          title: "Admin Mode Error",
-          message
-        });
-        pushActivity("error", "Admin Mode Change Failed", message);
-      }
-    },
-    [pushActivity, pushToast]
-  );
-
-  const handleRunAdminAction = useCallback(
-    async (actionId: AdminActionItem["id"]) => {
-      const actionTitle = adminActions.find((item) => item.id === actionId)?.title ?? actionId;
-
-      try {
-        setRunningAdminActionId(actionId);
-
-        const api = resolveLauncherApi();
-        const result = await api.runAdminAction(actionId);
-        unwrap(result);
-
-        if (actionId === "reloadCatalog") {
-          await refreshCatalog({ silent: true });
-        }
-
-        pushToast({
-          tone: "success",
-          title: "Admin Action Completed",
-          message: actionTitle
-        });
-        pushActivity("success", "Admin Action Completed", actionTitle);
-      } catch (error) {
-        const message = error instanceof Error ? error.message : "Admin action failed";
-        pushToast({
-          tone: "error",
-          title: "Admin Action Error",
-          message
-        });
-        pushActivity("error", "Admin Action Failed", `${actionTitle}: ${message}`);
-      } finally {
-        setRunningAdminActionId(null);
-      }
-    },
-    [adminActions, pushActivity, pushToast, refreshCatalog]
-  );
-
-  const handleLaunchFromPalette = useCallback(
-    (appId: string) => {
-      setIsCommandPaletteOpen(false);
-      setCommandQuery("");
-      void handleLaunch(appId);
-    },
-    [handleLaunch]
-  );
-
-  const handleLaunchFromDetails = useCallback(
-    (appId: string) => {
-      setInspectAppId(null);
-      void handleLaunch(appId);
-    },
-    [handleLaunch]
-  );
-
-  const installedAppsCount = catalog?.apps.filter((app) => app.installed).length ?? 0;
+  const installedAppsCount = catalog?.apps.filter((a) => a.installed).length ?? 0;
   const totalAppsCount = catalog?.apps.length ?? 0;
   const categoriesCount = catalog?.categories.length ?? 0;
 
@@ -387,110 +340,99 @@ export const App = () => {
     <>
       <BootSplash visible={splashVisible} progress={splashProgress} phase={splashPhase} />
 
-      <main className="oyna-shell" aria-hidden={splashVisible}>
-        <div className="oyna-backdrop" aria-hidden="true" />
+      {stage === "login" && !splashVisible && (
+        <LoginScreen onLogin={handleLogin} error={loginError} loading={loginLoading} />
+      )}
 
-        <LauncherTopBar
-          totalApps={totalAppsCount}
-          installedApps={installedAppsCount}
-          categoryCount={categoriesCount}
-          walletLabel={formatMinutesAsLabel(walletMinutes)}
-          adminModeEnabled={adminState?.adminModeEnabled ?? false}
-          processElevated={adminState?.processElevated ?? false}
-          dateLabel={dateLabel}
-          timeLabel={timeLabel}
-          refreshing={refreshingCatalog}
-          onOpenBilling={() => setIsBillingOpen(true)}
-          onRefreshCatalog={() => {
-            void refreshCatalog();
-          }}
-        />
+      {stage === "launcher" && (
+        <main className="oyna-shell" aria-hidden={splashVisible}>
+          <div className="oyna-backdrop" aria-hidden="true" />
 
-        <section className="oyna-grid">
-          <CatalogPanel
-            catalog={catalog}
-            search={search}
-            selectedCategory={selectedCategory}
-            launchingAppId={launchingAppId}
-            recentMap={recentMap}
-            onSearchChange={setSearch}
-            onCategoryChange={setSelectedCategory}
-            onLaunch={(appId) => {
-              void handleLaunch(appId);
-            }}
-            onInspectApp={setInspectAppId}
+          <LauncherTopBar
+            totalApps={totalAppsCount}
+            installedApps={installedAppsCount}
+            categoryCount={categoriesCount}
+            walletLabel={formatMinutesAsLabel(walletMinutes)}
+            dateLabel={dateLabel}
+            timeLabel={timeLabel}
+            refreshing={refreshingCatalog}
+            currentUser={currentUser}
+            seatSnapshot={seatSnapshot}
+            sessionElapsed={sessionElapsed}
+            onOpenBilling={() => setIsBillingOpen(true)}
+            onRefreshCatalog={() => void refreshCatalog()}
+            onStartSession={(id) => void handleStartSession(id)}
+            onEndSession={(id) => void handleEndSession(id)}
+            onLogout={handleLogout}
           />
 
-          <aside className="oyna-side-column">
-            <SystemActionsPanel
-              actions={systemActions}
-              runningActionId={runningSystemActionId}
-              onRunAction={handleRunSystemAction}
+          <section className="oyna-grid">
+            <CatalogPanel
+              catalog={catalog}
+              catalogError={catalogError}
+              search={search}
+              selectedCategory={selectedCategory}
+              launchingAppId={launchingAppId}
+              onSearchChange={setSearch}
+              onCategoryChange={setSelectedCategory}
+              onLaunch={(appId) => void handleLaunch(appId)}
+              onInspectApp={setInspectAppId}
             />
 
-            <AdminPanel
-              adminState={adminState}
-              actions={adminActions}
-              runningActionId={runningAdminActionId}
-              onToggleMode={handleToggleAdminMode}
-              onRunAction={(actionId) => {
-                void handleRunAdminAction(actionId);
-              }}
-            />
+            <aside className="oyna-side-column">
+              <SystemActionsPanel
+                actions={systemActions}
+                runningActionId={runningSystemActionId}
+                onRunAction={handleRunSystemAction}
+              />
+              <SessionSnapshotPanel
+                entries={activity}
+                walletLabel={formatMinutesAsLabel(walletMinutes)}
+                installedApps={installedAppsCount}
+                totalApps={totalAppsCount}
+              />
+            </aside>
+          </section>
 
-            <SessionSnapshotPanel
-              entries={activity}
-              walletLabel={formatMinutesAsLabel(walletMinutes)}
-              installedApps={installedAppsCount}
-              totalApps={totalAppsCount}
-              adminModeEnabled={adminState?.adminModeEnabled ?? false}
-            />
-          </aside>
-        </section>
+          <ToastStack toasts={toasts} onDismiss={dismissToast} />
 
-        <ToastStack toasts={toasts} onDismiss={dismissToast} />
+          <ConfirmActionModal
+            open={Boolean(confirmAction)}
+            action={confirmAction}
+            running={runningSystemActionId === confirmAction?.id}
+            onCancel={() => setConfirmAction(null)}
+            onConfirm={handleConfirmSystemAction}
+          />
 
-        <ConfirmActionModal
-          open={Boolean(confirmAction)}
-          action={confirmAction}
-          running={runningSystemActionId === confirmAction?.id}
-          onCancel={() => setConfirmAction(null)}
-          onConfirm={handleConfirmSystemAction}
-        />
+          <AppDetailsModal
+            open={Boolean(selectedApp)}
+            app={selectedApp}
+            lastLaunchedAt={selectedApp ? (recentMap.get(selectedApp.id) ?? null) : null}
+            launchingAppId={launchingAppId}
+            onClose={() => setInspectAppId(null)}
+            onLaunch={(appId) => { setInspectAppId(null); void handleLaunch(appId); }}
+          />
 
-        <AppDetailsModal
-          open={Boolean(selectedApp)}
-          app={selectedApp}
-          lastLaunchedAt={selectedApp ? (recentMap.get(selectedApp.id) ?? null) : null}
-          launchingAppId={launchingAppId}
-          onClose={() => setInspectAppId(null)}
-          onLaunch={handleLaunchFromDetails}
-        />
+          <CommandPaletteModal
+            open={isCommandPaletteOpen}
+            catalog={catalog}
+            query={commandQuery}
+            launchingAppId={launchingAppId}
+            onClose={() => { setIsCommandPaletteOpen(false); setCommandQuery(""); }}
+            onQueryChange={setCommandQuery}
+            onLaunch={(appId) => { setIsCommandPaletteOpen(false); setCommandQuery(""); void handleLaunch(appId); }}
+          />
 
-        <CommandPaletteModal
-          open={isCommandPaletteOpen}
-          catalog={catalog}
-          query={commandQuery}
-          launchingAppId={launchingAppId}
-          onClose={() => {
-            setIsCommandPaletteOpen(false);
-            setCommandQuery("");
-          }}
-          onQueryChange={setCommandQuery}
-          onLaunch={handleLaunchFromPalette}
-        />
-
-        <BillingFeature
-          open={isBillingOpen}
-          walletMinutes={walletMinutes}
-          onClose={() => setIsBillingOpen(false)}
-          onWalletChange={setWalletMinutes}
-          onToast={pushToast}
-          onActivity={pushActivity}
-        />
-      </main>
+          <BillingFeature
+            open={isBillingOpen}
+            walletMinutes={walletMinutes}
+            onClose={() => setIsBillingOpen(false)}
+            onWalletChange={setWalletMinutes}
+            onToast={pushToast}
+            onActivity={pushActivity}
+          />
+        </main>
+      )}
     </>
   );
 };
-
-

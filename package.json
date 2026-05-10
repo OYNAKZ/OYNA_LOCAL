@@ -3,11 +3,12 @@
   "version": "0.1.0",
   "description": "Production-ready Electron launcher foundation for Windows shell scenarios",
   "private": true,
-  "main": "out/main/index.js",
+  "main": "out/main/index.cjs",
   "type": "module",
   "scripts": {
     "dev": "electron-vite dev",
     "build": "electron-vite build",
+    "start": "electron .",
     "preview": "electron-vite preview",
     "typecheck": "tsc --noEmit"
   },

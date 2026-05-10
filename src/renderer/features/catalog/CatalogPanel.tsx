@@ -5,10 +5,10 @@ import { AppCard } from "@renderer/features/catalog/components/AppCard";
 
 interface CatalogPanelProps {
   catalog: CatalogSnapshot | null;
+  catalogError: string | null;
   search: string;
   selectedCategory: string;
   launchingAppId: string | null;
-  recentMap: Map<string, string>;
   onSearchChange(value: string): void;
   onCategoryChange(value: string): void;
   onLaunch(appId: string): void;
@@ -38,10 +38,10 @@ const filterApps = (apps: LauncherApp[], selectedCategory: string, search: strin
 
 export const CatalogPanel = ({
   catalog,
+  catalogError,
   search,
   selectedCategory,
   launchingAppId,
-  recentMap,
   onSearchChange,
   onCategoryChange,
   onLaunch,
@@ -67,7 +67,7 @@ export const CatalogPanel = ({
         <header className="panel-title-row">
           <h2>Applications</h2>
         </header>
-        <p className="muted">Loading catalog...</p>
+        <p className="muted">{catalogError ? `Catalog error: ${catalogError}` : "Loading catalog..."}</p>
       </section>
     );
   }
@@ -117,7 +117,6 @@ export const CatalogPanel = ({
               key={app.id}
               app={app}
               launching={launchingAppId === app.id}
-              lastLaunchedAt={recentMap.get(app.id)}
               onLaunch={onLaunch}
               onInspect={onInspectApp}
             />
